@@ -1,6 +1,6 @@
 # Cinema Web App
 
-A full-stack cinema ticket booking platform built with Spring Boot and React. The system covers the complete booking lifecycle — from film discovery and seat selection through to payment and e-ticket delivery — alongside an administrative suite for cinema operations and revenue reporting.
+A personal learning project. A cinema ticket booking web application built with **Java** and **Spring Boot**, inspired by the CGV Cinema model. This project was built to practise building a **RESTful API** backend with **Spring Security**, **JWT** authentication, and **Spring Data JPA**, integrated with a **React** frontend.
 
 ---
 
@@ -17,16 +17,18 @@ A full-stack cinema ticket booking platform built with Spring Boot and React. Th
 
 **Backend**
 
-Copy the configuration template, populate the required values (see [Configuration](#configuration)), then start the server:
-
 ```bash
 cp backend/src/main/resources/application.properties.example \
    backend/src/main/resources/application.properties
+```
 
+Edit `application.properties` with your database credentials and JWT secret, then:
+
+```bash
 cd backend && mvn spring-boot:run
 ```
 
-The API starts on `http://localhost:8080`.
+API runs on `http://localhost:8080`.
 
 **Frontend**
 
@@ -34,100 +36,95 @@ The API starts on `http://localhost:8080`.
 cd frontend && npm install && npm run dev
 ```
 
-The client starts on `http://localhost:5173`.
+Client runs on `http://localhost:5173`.
 
 ---
 
 ## Configuration
 
-`application.properties` is excluded from version control. The required keys are:
-
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5433/cinemadb
-spring.datasource.username=
-spring.datasource.password=
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
 
 # Generate with: openssl rand -hex 32
-application.security.jwt.secret-key=
+application.security.jwt.secret-key=YOUR_JWT_SECRET
 application.security.jwt.expiration=86400000
 ```
 
-Values may alternatively be supplied as environment variables.
+---
+
+## Tech Stack
+
+**Backend**
+
+- **Java 17** + **Spring Boot 3.3.0**
+- **Spring Security** + **JWT** (`jjwt 0.11.5`) for authentication and route protection
+- **Spring Data JPA** + **Hibernate** for ORM
+- **PostgreSQL 17** as the primary database
+- **MapStruct** for DTO mapping, **Lombok** to reduce boilerplate
+- **SpringDoc OpenAPI** for auto-generated API docs (`/swagger-ui.html`)
+
+**Frontend**
+
+- **React 19** + **Vite 8**
+- **Tailwind CSS v4** for styling
+- **React Router DOM v7** for client-side routing
+- **Axios** for HTTP requests
 
 ---
 
-## Architecture
-
-The backend follows a strict layered model: `controller → service → repository`. Business entities are never serialised directly into API responses; all cross-boundary data travels via DTOs mapped through MapStruct interfaces. Dependency injection uses constructor injection throughout, enforced by Lombok's `@RequiredArgsConstructor`. Deletion of any business record sets `isActive = false` rather than removing the row; all read queries filter on this flag.
-
-The frontend separates concerns by actor and responsibility. HTTP calls are centralised in the `api/` layer and are never made directly from page components. Route-level access control is enforced in `ProtectedRoute.jsx`.
+## Project Structure
 
 ```
 cinema-web-app/
 ├── backend/src/main/java/com/cinema/
-│   ├── config/
-│   ├── controller/
-│   ├── dto/
-│   ├── entity/
-│   ├── exception/
-│   ├── mapper/
-│   ├── repository/
-│   ├── security/
-│   └── service/impl/
+│   ├── config/          # Spring Security and app config
+│   ├── controller/      # REST API endpoints
+│   ├── dto/             # Data Transfer Objects
+│   ├── entity/          # JPA entities
+│   ├── mapper/          # MapStruct interfaces
+│   ├── repository/      # JPA repositories
+│   ├── security/        # JWT filter and auth logic
+│   └── service/impl/    # Business logic
 │
 └── frontend/src/
-    ├── api/
+    ├── api/             # Axios client and API calls
     ├── components/
-    │   ├── common/
-    │   └── feature/
-    ├── context/
+    ├── context/         # Auth context
     ├── layouts/
     ├── pages/
     │   ├── admin/
     │   ├── auth/
     │   └── client/
-    └── routes/
+    └── routes/          # Protected routes
 ```
 
 ---
 
-## Stack
+## Features
 
-| | |
-| --- | --- |
-| Backend | Java 17, Spring Boot 3.3.0 |
-| Security | Spring Security, JWT via jjwt 0.11.5 |
-| Persistence | PostgreSQL 17, Spring Data JPA, Hibernate |
-| Mapping | MapStruct 1.5.5, Lombok |
-| API docs | SpringDoc OpenAPI — `http://localhost:8080/swagger-ui.html` |
-| Frontend | React 19, Vite 8, Tailwind CSS v4 |
-| Routing | React Router DOM v7 |
-| HTTP | Axios |
+**Customer**
 
----
+- Browse now-showing and upcoming films
+- Select seats through an interactive seat map
+- Multi-step booking flow: film → showtime → seats → payment
+- QR-coded e-ticket after booking
 
-## Access Control
+**Admin**
 
-| Role | Scope |
-| --- | --- |
-| Guest | Browse films and showtimes; authentication required to book |
-| Member | Book tickets, purchase concessions, view history, accumulate loyalty points |
-| Cinema Admin | Manage showtimes; validate tickets by QR scan at the venue |
-| Super Admin | Full system access including cross-location revenue reporting |
+- Manage films, cinemas, rooms, and showtimes
+- View bookings and validate tickets by QR scan
 
 ---
 
-## Business Constraints
+## What I Practised
 
-**Seat hold.** On entering the payment step, selected seats are locked for up to ten minutes. The lock releases automatically on timeout or payment failure.
-
-**Booking window.** Purchase and cancellation are permitted only up to thirty minutes before the scheduled showtime.
-
-**Age classification.** An explicit warning is presented to the customer when booking any film classified C13, C16, or C18.
-
-**Concurrent reservation.** Database-level locking prevents two concurrent requests from successfully reserving the same seat.
-
-**Password storage.** Passwords are hashed with BCrypt prior to persistence.
+- Designing a layered **Spring Boot** application (`controller → service → repository`)
+- Implementing **JWT**-based authentication with **Spring Security**
+- Using **Spring Data JPA** with entity relationships and soft delete
+- Applying **MapStruct** to map between `Entity` and `DTO`
+- Building a protected **React** frontend that consumes a **REST API**
 
 ---
 
