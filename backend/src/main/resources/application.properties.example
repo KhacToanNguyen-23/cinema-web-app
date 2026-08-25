@@ -1,0 +1,26 @@
+# Copy file này thành application.properties và điền thông tin thật vào
+# Copy this file to application.properties and fill in your actual values
+
+# Server Port
+server.port=8080
+
+# Application Name
+spring.application.name=cinema-backend
+
+# ===============================
+# PostgreSQL Configuration
+# ===============================
+spring.datasource.url=jdbc:postgresql://localhost:5433/cinemadb
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+
+# Hibernate ddl-auto
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# JWT Configuration
+# Generate a secure secret: openssl rand -hex 32
+application.security.jwt.secret-key=YOUR_JWT_SECRET_KEY_HERE
+application.security.jwt.expiration=86400000
+# (86400000 ms = 1 day)

@@ -1,0 +1,61 @@
+# ===========================
+# BACKEND - Java / Maven
+# ===========================
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/*.class
+backend/*.log
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+*.swp
+
+# ===========================
+# FRONTEND - Node / Vite
+# ===========================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===========================
+# ENVIRONMENT & SECRETS
+# ===========================
+.env
+.env.local
+.env.production
+*.env
+
+# Sensitive config files — keep only .example in repo
+backend/src/main/resources/application.properties
+backend/src/main/resources/application-local.properties
+backend/src/main/resources/application-prod.properties
+
+# ===========================
+# OS FILES
+# ===========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================
+# MISC
+# ===========================
+stitch_cinema_management_system/
+*.tmp
+*.bak
