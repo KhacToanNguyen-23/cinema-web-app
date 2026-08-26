@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { userApi } from '../../api/userApi';
+import { cinemaApi } from '../../api/cinemaApi';
 import { useAuth } from '../../context/AuthContext';
 
 const UserManagementPage = () => {
   const { user } = useAuth(); // To check if current user is ADMIN
   const [users, setUsers] = useState([]);
+  const [cinemas, setCinemas] = useState([]);
   const [loading, setLoading] = useState(true);
   
   const [showModal, setShowModal] = useState(false);
@@ -15,23 +17,28 @@ const UserManagementPage = () => {
     fullName: '',
     email: '',
     phone: '',
-    role: 'MEMBER'
+    role: 'MEMBER',
+    cinemaId: ''
   });
   
   const isAdmin = user?.role === 'ADMIN';
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsersAndCinemas();
   }, []);
 
-  const fetchUsers = async () => {
+  const fetchUsersAndCinemas = async () => {
     try {
       setLoading(true);
-      const res = await userApi.getAllUsers();
-      setUsers(res.data);
+      const [usersRes, cinemasRes] = await Promise.all([
+        userApi.getAllUsers(),
+        cinemaApi.getAllCinemas()
+      ]);
+      setUsers(usersRes.data);
+      setCinemas(cinemasRes.data);
     } catch (error) {
-      console.error('Failed to fetch users:', error);
-      alert('Không thể tải danh sách người dùng');
+      console.error(error);
+      alert('Lỗi tải dữ liệu');
     } finally {
       setLoading(false);
     }
@@ -46,7 +53,8 @@ const UserManagementPage = () => {
         fullName: user.fullName || '',
         email: user.email || '',
         phone: user.phone || '',
-        role: user.role || 'MEMBER'
+        role: user.role || 'MEMBER',
+        cinemaId: user.cinemaId || ''
       });
     } else {
       setFormData({
@@ -56,7 +64,8 @@ const UserManagementPage = () => {
         fullName: '',
         email: '',
         phone: '',
-        role: 'MEMBER'
+        role: 'MEMBER',
+        cinemaId: ''
       });
     }
     setShowModal(true);
@@ -86,7 +95,7 @@ const UserManagementPage = () => {
         alert('Thêm người dùng thành công!');
       }
       setShowModal(false);
-      fetchUsers();
+      fetchUsersAndCinemas();
     } catch (error) {
       console.error(error);
       alert('Có lỗi xảy ra: ' + (error.response?.data?.message || error.message));
@@ -98,7 +107,7 @@ const UserManagementPage = () => {
       try {
         await userApi.deleteUser(id);
         alert('Xóa thành công!');
-        fetchUsers();
+        fetchUsersAndCinemas();
       } catch (error) {
         console.error(error);
         alert('Lỗi khi xóa người dùng');
@@ -226,6 +235,22 @@ const UserManagementPage = () => {
                   <option value="ADMIN">ADMIN (Quản trị hệ thống)</option>
                 </select>
               </div>
+
+              {/* [AI UPDATE - Thêm ô chọn Rạp cho Manager và Staff] */}
+              {(formData.role === 'MANAGER' || formData.role === 'STAFF') && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Trực thuộc Rạp (Bắt buộc) <span className="text-red-500">*</span></label>
+                  <select 
+                    name="cinemaId" value={formData.cinemaId} onChange={handleChange} required
+                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:border-red-500"
+                  >
+                    <option value="">-- Chọn rạp --</option>
+                    {cinemas.map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="flex justify-end space-x-3 pt-4 border-t border-gray-700">
                 <button type="button" onClick={handleCloseModal} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors">

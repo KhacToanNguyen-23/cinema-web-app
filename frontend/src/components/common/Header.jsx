@@ -36,6 +36,12 @@ const Header = () => {
               />
               <div className="absolute right-0 top-full mt-2 w-48 bg-surface-container-high rounded-xl shadow-xl border border-outline-variant/30 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden">
                 <button className="px-md py-sm text-left hover:bg-surface-bright text-on-surface text-sm transition-colors">Trang Cá Nhân</button>
+                {/* [AI UPDATE - Thêm nút truy cập trang Quản trị] */}
+                {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
+                  <Link to="/admin/dashboard" className="px-md py-sm text-left hover:bg-surface-bright text-on-surface text-sm transition-colors">
+                    Vào trang Quản trị
+                  </Link>
+                )}
                 <button onClick={logout} className="px-md py-sm text-left hover:bg-surface-bright text-error text-sm transition-colors">Đăng xuất</button>
               </div>
             </div>
