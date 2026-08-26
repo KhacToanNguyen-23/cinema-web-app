@@ -11,5 +11,6 @@ public interface ShowtimeService {
     Showtime updateShowtime(Long id, Showtime showtime);
     void deleteShowtime(Long id);
     List<Showtime> getAllShowtimes();
+    List<Showtime> getShowtimesByCinemaId(Long cinemaId);
 }
 

@@ -2,7 +2,9 @@ package com.cinema.service.impl;
 
 import com.cinema.dto.UserDto;
 import com.cinema.entity.User;
+import com.cinema.entity.Cinema;
 import com.cinema.repository.UserRepository;
+import com.cinema.repository.CinemaRepository;
 import com.cinema.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final CinemaRepository cinemaRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -46,6 +49,10 @@ public class UserServiceImpl implements UserService {
         user.setRewardPoint(0);
         user.setMemberTier("STANDARD");
         user.setCreatedAt(LocalDateTime.now());
+        if (dto.getCinemaId() != null) {
+            Cinema cinema = cinemaRepository.findById(dto.getCinemaId()).orElse(null);
+            user.setCinema(cinema);
+        }
 
         User savedUser = userRepository.save(user);
         return mapToDto(savedUser);
@@ -69,6 +76,13 @@ public class UserServiceImpl implements UserService {
         if (dto.getMemberTier() != null) {
             user.setMemberTier(dto.getMemberTier());
         }
+        
+        if (dto.getCinemaId() != null) {
+            Cinema cinema = cinemaRepository.findById(dto.getCinemaId()).orElse(null);
+            user.setCinema(cinema);
+        } else {
+            user.setCinema(null);
+        }
 
         User updatedUser = userRepository.save(user);
         return mapToDto(updatedUser);
@@ -91,6 +105,7 @@ public class UserServiceImpl implements UserService {
                 .rewardPoint(user.getRewardPoint())
                 .memberTier(user.getMemberTier())
                 .createdAt(user.getCreatedAt())
+                .cinemaId(user.getCinema() != null ? user.getCinema().getId() : null)
                 .build();
     }
 }

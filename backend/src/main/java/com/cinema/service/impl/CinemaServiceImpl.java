@@ -1,12 +1,12 @@
 package com.cinema.service.impl;
 import java.util.List;
-import javax.imageio.IIOException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import com.cinema.entity.Cinema;
 import com.cinema.repository.CinemaRepository;
 import com.cinema.service.CinemaService;
+import com.cinema.entity.Region;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class CinemaServiceImpl implements CinemaService {
         
         // Kiểm tra Region có tồn tại không
         if (cinema.getRegion() != null && cinema.getRegion().getId() > 0) {
-            com.cinema.entity.Region region = regionRepository.findById(cinema.getRegion().getId())
+                Region region = regionRepository.findById(cinema.getRegion().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Region does not exist."));
             cinema.setRegion(region);
         } else {

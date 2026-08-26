@@ -16,6 +16,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // [AI UPDATE - Đổi thứ tự: Tạo dữ liệu Rạp/Phim trước để có rạp gán cho Manager]
+        initCinemaData();
+
         // 1. Tài khoản Admin
         if (userRepository.findByUsername("admin").isEmpty()) {
             User admin = User.builder()
@@ -28,10 +31,14 @@ public class DataInitializer implements CommandLineRunner {
 
         // 2. Tài khoản Manager
         if (userRepository.findByUsername("manager").isEmpty()) {
+            // Lấy rạp đầu tiên để gán cho Manager demo
+            com.cinema.entity.Cinema firstCinema = cinemaRepository.findAll().stream().findFirst().orElse(null);
+            
             User manager = User.builder()
                     .username("manager")
                     .password(passwordEncoder.encode("123456"))
                     .role("MANAGER")
+                    .cinema(firstCinema)
                     .build();
             userRepository.save(manager);
         }
@@ -55,9 +62,6 @@ public class DataInitializer implements CommandLineRunner {
                     .build();
             userRepository.save(member);
         }
-
-        // --- KHỞI TẠO DỮ LIỆU RẠP & PHIM MẪU ---
-        initCinemaData();
 
         System.out.println("=========================================");
         System.out.println("✅ KHỞI TẠO TÀI KHOẢN & DỮ LIỆU MẪU THÀNH CÔNG");

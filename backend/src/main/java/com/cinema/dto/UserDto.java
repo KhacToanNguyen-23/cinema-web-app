@@ -22,4 +22,5 @@ public class UserDto {
     private int rewardPoint;
     private String memberTier;
     private LocalDateTime createdAt;
+    private Long cinemaId;
 }

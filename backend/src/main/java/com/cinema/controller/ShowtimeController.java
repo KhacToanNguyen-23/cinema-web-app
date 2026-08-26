@@ -22,9 +22,16 @@ public class ShowtimeController {
     private final MovieRepository movieRepository;
     private final RoomRepository roomRepository;
 
+    // [AI UPDATE - Thêm RequestParam cinemaId để lọc dữ liệu cho Manager]
     @GetMapping
-    public ResponseEntity<List<ShowtimeDto>> getAllShowtimes() {
-        return ResponseEntity.ok(showtimeService.getAllShowtimes().stream().map(showtimeMapper::toDto).collect(Collectors.toList()));
+    public ResponseEntity<List<ShowtimeDto>> getAllShowtimes(@RequestParam(required = false) Long cinemaId) {
+        List<Showtime> showtimes;
+        if (cinemaId != null) {
+            showtimes = showtimeService.getShowtimesByCinemaId(cinemaId);
+        } else {
+            showtimes = showtimeService.getAllShowtimes();
+        }
+        return ResponseEntity.ok(showtimes.stream().map(showtimeMapper::toDto).collect(Collectors.toList()));
     }
 
     @PostMapping

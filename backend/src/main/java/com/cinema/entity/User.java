@@ -31,6 +31,11 @@ public class User implements UserDetails {
     private int rewardPoint;
     private String memberTier;
     private LocalDateTime createdAt;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cinema_id")
+    private Cinema cinema;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
        return List.of(new SimpleGrantedAuthority(role));

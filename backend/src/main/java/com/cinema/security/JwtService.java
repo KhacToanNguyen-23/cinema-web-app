@@ -27,6 +27,14 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         HashMap<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+        
+        // [AI UPDATE - Bơm cinemaId vào JWT để Frontend phân quyền Manager theo cụm rạp]
+        if (userDetails instanceof com.cinema.entity.User) {
+            com.cinema.entity.User user = (com.cinema.entity.User) userDetails;
+            if (user.getCinema() != null) {
+                extraClaims.put("cinemaId", user.getCinema().getId());
+            }
+        }
         return generateToken(extraClaims, userDetails);
     }
 

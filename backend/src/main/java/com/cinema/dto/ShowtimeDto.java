@@ -9,6 +9,8 @@ public class ShowtimeDto {
     private LocalDateTime endTime;
     private Long movieId;
     private Long roomId;
+    private MovieDto movie;
+    private RoomDto room;
     private double price;
     private boolean isActive;
 }
