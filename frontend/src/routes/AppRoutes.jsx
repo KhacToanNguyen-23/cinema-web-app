@@ -5,6 +5,8 @@ import StaffLayout from '../layouts/StaffLayout';
 import LandingPage from '../pages/client/LandingPage';
 import SearchPage from '../pages/client/SearchPage';
 import AdminMoviePage from '../pages/admin/AdminMoviePage';
+import AdminShowtimePage from '../pages/admin/AdminShowtimePage';
+import AdminCinemaPage from '../pages/admin/AdminCinemaPage';
 import StaffPOSPage from '../pages/staff/StaffPOSPage';
 import LoginPage from '../pages/auth/LoginPage';
 import UserManagementPage from '../pages/admin/UserManagementPage';
@@ -25,7 +27,9 @@ const AppRoutes = () => {
         <Route element={<AdminLayout><Outlet /></AdminLayout>}>
           <Route path="movies" element={<AdminMoviePage />} />
           <Route path="dashboard" element={<div className="p-xl text-on-surface">Dashboard placeholder</div>} />
-          <Route path="schedule" element={<div className="p-xl text-on-surface">Schedule placeholder</div>} />
+          <Route path="schedule" element={<AdminShowtimePage />} />
+          {/* [AI UPDATE - Thêm route quản lý rạp chiếu, chỉ dành cho ADMIN] */}
+          <Route path="cinemas" element={<AdminCinemaPage />} />
           <Route path="users" element={<UserManagementPage />} />
           <Route path="reports" element={<div className="p-xl text-on-surface">Reports placeholder</div>} />
         </Route>
