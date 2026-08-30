@@ -1,5 +1,6 @@
 package com.cinema.controller;
 import com.cinema.dto.SeatDto;
+import com.cinema.entity.Room;
 import com.cinema.mapper.SeatMapper;
 import com.cinema.service.SeatService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class SeatController {
         return ResponseEntity.ok(seatService.getSeatsByRoomId(roomId).stream().map(seatMapper::toDto).collect(Collectors.toList()));
     }
     @PostMapping
-    public ResponseEntity<SeatDto> createSeat(@RequestBody SeatDto dto) {
-        return ResponseEntity.ok(seatMapper.toDto(seatService.createSeat(seatMapper.toEntity(dto))));
+    public ResponseEntity<List<SeatDto>> createSeat(@RequestBody List<SeatDto> dtos) {
+        return ResponseEntity.ok(seatService.createListSeatDtos(dtos));
     }
     @PutMapping("/{id}")
     public ResponseEntity<SeatDto> updateSeat(@PathVariable Long id, @RequestBody SeatDto dto) {
@@ -36,4 +37,6 @@ public class SeatController {
         seatService.deleteSeat(id);
         return ResponseEntity.noContent().build();
     }
+
+  
 }

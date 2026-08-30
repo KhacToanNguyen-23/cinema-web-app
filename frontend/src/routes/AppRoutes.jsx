@@ -7,6 +7,8 @@ import SearchPage from '../pages/client/SearchPage';
 import AdminMoviePage from '../pages/admin/AdminMoviePage';
 import AdminShowtimePage from '../pages/admin/AdminShowtimePage';
 import AdminCinemaPage from '../pages/admin/AdminCinemaPage';
+import AdminRoomPage from '../pages/admin/AdminRoomPage';
+import AdminSeatPage from '../pages/admin/AdminSeatPage';
 import StaffPOSPage from '../pages/staff/StaffPOSPage';
 import LoginPage from '../pages/auth/LoginPage';
 import UserManagementPage from '../pages/admin/UserManagementPage';
@@ -28,8 +30,10 @@ const AppRoutes = () => {
           <Route path="movies" element={<AdminMoviePage />} />
           <Route path="dashboard" element={<div className="p-xl text-on-surface">Dashboard placeholder</div>} />
           <Route path="schedule" element={<AdminShowtimePage />} />
-          {/* [AI UPDATE - Thêm route quản lý rạp chiếu, chỉ dành cho ADMIN] */}
           <Route path="cinemas" element={<AdminCinemaPage />} />
+          {/* [AI UPDATE - Thêm route quản lý phòng chiếu và sơ đồ ghế] */}
+          <Route path="rooms" element={<AdminRoomPage />} />
+          <Route path="rooms/:roomId/seats" element={<AdminSeatPage />} />
           <Route path="users" element={<UserManagementPage />} />
           <Route path="reports" element={<div className="p-xl text-on-surface">Reports placeholder</div>} />
         </Route>

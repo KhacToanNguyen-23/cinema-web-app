@@ -11,5 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     // Tự code các custom query (VD: findBy...) ở đây
     List<Seat> findByRoomId(Long roomId);
+    boolean existsByRoomIdAndSeatRowAndSeatColumn(Long roomId, String seatRow, int seatColumn);
 }
 

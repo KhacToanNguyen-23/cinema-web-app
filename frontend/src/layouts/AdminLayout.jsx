@@ -5,8 +5,9 @@ const ADMIN_LINKS = [
   { path: '/admin/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { path: '/admin/schedule', icon: 'calendar_month', label: 'Schedule' },
   { path: '/admin/movies', icon: 'movie', label: 'Movies', roles: ['ADMIN'] },
-  // [AI UPDATE - Thêm link Rạp Chiếu, chỉ hiện với ADMIN]
   { path: '/admin/cinemas', icon: 'theater_comedy', label: 'Rạp Chiếu', roles: ['ADMIN'] },
+  // [AI UPDATE - Mở quyền xem và quản lý Phòng Chiếu cho cả ADMIN và MANAGER]
+  { path: '/admin/rooms', icon: 'meeting_room', label: 'Phòng Chiếu', roles: ['ADMIN', 'MANAGER'] },
   { path: '/admin/users', icon: 'group', label: 'Users', roles: ['ADMIN'] },
   { path: '/admin/reports', icon: 'bar_chart', label: 'Reports' },
 ];

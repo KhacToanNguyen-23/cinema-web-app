@@ -6,6 +6,7 @@ import com.cinema.repository.CinemaRepository;
 import com.cinema.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.cinema.entity.Cinema;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class RoomServiceImpl implements RoomService {
         if (room.getCinema() == null || room.getCinema().getId() <= 0) {
             throw new IllegalArgumentException("Cinema ID is required");
         }
-        com.cinema.entity.Cinema cinema = cinemaRepository.findById(room.getCinema().getId())
+        Cinema cinema = cinemaRepository.findById(room.getCinema().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Cinema not found"));
         
         room.setCinema(cinema);
@@ -35,13 +36,14 @@ public class RoomServiceImpl implements RoomService {
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
         
         if (roomDetails.getCinema() != null && roomDetails.getCinema().getId() > 0) {
-            com.cinema.entity.Cinema cinema = cinemaRepository.findById(roomDetails.getCinema().getId())
+            Cinema cinema = cinemaRepository.findById(roomDetails.getCinema().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Cinema not found"));
             existing.setCinema(cinema);
         }
 
         existing.setRoomType(roomDetails.getRoomType());
         existing.setCapacity(roomDetails.getCapacity());
+        existing.setName(roomDetails.getName());
         
         return roomRepository.save(existing);
     }

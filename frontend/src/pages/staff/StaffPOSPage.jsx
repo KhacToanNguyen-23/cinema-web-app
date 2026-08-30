@@ -1,339 +1,535 @@
-import { useState, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { showtimeApi } from '../../api/showtimeApi';
+import { movieApi } from '../../api/movieApi';
+import { showtimeSeatApi } from '../../api/showtimeSeatApi';
+import { useSeatWebSocket } from '../../hooks/useSeatWebSocket';
 
-const TICKET_PRICE = 14.50;
-
-const ADDONS = [
-  { id: 'a1', name: 'Lrg Popcorn', price: 8.50, icon: 'local_dining', color: 'text-secondary-fixed' },
-  { id: 'a2', name: 'Med Soda', price: 5.00, icon: 'local_drink', color: 'text-tertiary-fixed' },
-  { id: 'a3', name: 'Nachos', price: 4.50, icon: 'tapas', color: 'text-primary-fixed' },
-  { id: 'a4', name: 'Candy Box', price: 3.00, icon: 'icecream', color: 'text-on-surface-variant' }
+const SNACKS = [
+  { id: 1, name: 'Bap Rang Bo (Vua)', price: 45000, icon: 'local_dining', desc: 'Bap thom mui bo' },
+  { id: 2, name: 'Bap Rang Pho Mai (Lon)', price: 65000, icon: 'local_dining', desc: 'Phu sot pho mai dam da' },
+  { id: 3, name: 'Nuoc Ngot Pepsi 22oz', price: 30000, icon: 'local_drink', desc: 'Lanh thanh mat' },
+  { id: 4, name: 'Combo Solo (1 Bap + 1 Nuoc)', price: 70000, icon: 'fastfood', desc: 'Tiet kiem 10%' },
+  { id: 5, name: 'Combo Couple (1 Bap Lon + 2 Nuoc)', price: 110000, icon: 'restaurant', desc: 'Danh cho 2 nguoi' },
 ];
 
-const MOVIES = [
-  {
-    id: 'm1',
-    title: 'Dune: Part Two',
-    info: '166 min • Sci-Fi',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCyuOKboyR3J79DtbDAQrx5SWsc9keibNSthHh7moqYb_gZ3X24YjSrlTbjF7AGahYM9AwztJdR9D3HsE6hGOixrAaSM7tsQoMBYGKTamDrtzeumhHgIFcnLM_S-vTL9WbldUcGp9RPMnC_WhrzniClft17LnmoxUasJLHzSo8ivBglCkcSmDCClPeiyLJufrY_ARLL9CQvZB8Z9n22a9tLZk8FtP3B3lUv-CKJX4AsTqvM_Sbi3Zju',
-    badge: 'IMAX',
-    badgeColor: 'bg-primary-container text-on-primary-container',
-    showtimes: ['14:30', '18:00', '21:15']
-  },
-  {
-    id: 'm2',
-    title: 'Godzilla x Kong',
-    info: '115 min • Action',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBScRRhxeQxMEASiD4Klp4TCfz_y1USh2mzoF4BVHFFdVtwAHO6HAuuAuzzmnChpW-GJW1V2IpeD3jjP0VhX0-IOHmoIM9iJ23GOJpH6LNVh8NnmVWvkAQA9tdRXlacrP3FJSM4vwYBOjv3mVxUa0lmU_NGsN84IgfLshUXE3a0drLPOUFwMfDBl-hV0avumv8VPxTmdS74djzP8d5fTnUme3BuzquGo-jlDpanPlUcT0nu_xoAAUKF',
-    badge: '3D',
-    badgeColor: 'bg-secondary-container text-on-secondary-container',
-    showtimes: ['13:15', '15:45', '19:30']
-  },
-  {
-    id: 'm3',
-    title: 'Civil War',
-    info: '109 min • Thriller',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNyA9sLwPjSvLZsBy6L9xDblunrWeQCQeDC3b2yr00Ks9ZKGtddSdzDV6U9QkCfuPJjosCrJHwbpeUYnr4i1Ab08xVfm13vAfK5aey5r1sGwnXOyhIn4XoNkq10m8NiQxDBejTZvhXRdiSlCSk0PO9MSHZUfCb_dBGoLiP8iy23nui5NPTxKFMbWMxJ2V56s-O9laqL0CKBl17dA-R8FwqHCimB2y4yI2NPaE98FWvhRWmdsTxdnPt',
-    showtimes: ['16:00', '20:20', '22:45 (Sold Out)']
-  }
-];
+const TYPE_COLOR = {
+  NORMAL: { bg: 'bg-surface-container-highest hover:bg-surface-bright', label: 'N', text: 'text-on-surface' },
+  VIP: { bg: 'bg-yellow-900/60 hover:bg-yellow-800/60', label: 'V', text: 'text-yellow-300' },
+  COUPLE: { bg: 'bg-pink-900/60 hover:bg-pink-800/60', label: 'C', text: 'text-pink-300' },
+};
 
 const StaffPOSPage = () => {
-  const [selectedMovie, setSelectedMovie] = useState(null);
+  const { user } = useAuth();
+  const cinemaId = user?.cinemaId;
+
+  const [showtimes, setShowtimes] = useState([]);
+  const [movies, setMovies] = useState([]);
   const [selectedShowtime, setSelectedShowtime] = useState(null);
+  const [seatList, setSeatList] = useState([]);
   const [cartItems, setCartItems] = useState([]);
-  
-  // Generating a static seat map for demo
-  const seatRows = useMemo(() => {
-    const rows = ['A','B','C','D','E','F','G','H'];
-    return rows.map((rowLabel, rIndex) => {
-      const blocks = [4, 6, 4];
-      let seatNum = 1;
-      const rowBlocks = blocks.map(blockSize => {
-        const seatsInBlock = [];
-        for(let i=0; i<blockSize; i++) {
-          const seatId = `${rowLabel}${seatNum}`;
-          const isTaken = Math.random() < (0.4 + (rIndex * 0.05)) && rIndex > 1; 
-          seatsInBlock.push({ id: seatId, isTaken });
-          seatNum++;
-        }
-        return seatsInBlock;
-      });
-      return { label: rowLabel, blocks: rowBlocks };
-    });
-  }, [selectedShowtime]); // Re-generate seats when showtime changes
+  const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('CASH');
+  const [cashGiven, setCashGiven] = useState('');
+  const [printTicketModal, setPrintTicketModal] = useState(false);
+  const [lastOrder, setLastOrder] = useState(null);
 
-  const handleShowtimeClick = (movie, time) => {
-    if (time.includes('Sold Out')) return;
-    setSelectedMovie(movie);
-    setSelectedShowtime(time);
-    // clear tickets from cart when changing showtime
-    setCartItems(prev => prev.filter(item => item.type !== 'ticket'));
+  useEffect(() => {
+    fetchInitialData();
+  }, [cinemaId]);
+
+  const fetchInitialData = async () => {
+    try {
+      setLoading(true);
+      const [showtimesRes, moviesRes] = await Promise.all([
+        showtimeApi.getAllShowtimes(cinemaId),
+        movieApi.getAllMovies(),
+      ]);
+      setShowtimes(showtimesRes.data || []);
+      setMovies((moviesRes.data || []).filter((m) => m.active || m.isActive));
+    } catch (err) {
+      console.error('[POS] Failed to fetch showtimes or movies:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleBackToMovies = () => {
-    setSelectedMovie(null);
-    setSelectedShowtime(null);
+  const fetchSeatsForShowtime = async (showtime) => {
+    try {
+      setLoading(true);
+      setSelectedShowtime(showtime);
+      setCartItems([]);
+      const res = await showtimeSeatApi.getSeatLayout(showtime.id);
+      setSeatList(res.data || []);
+    } catch (err) {
+      console.error('[POS] Failed to load seat layout:', err);
+      alert('Khong the tai so do ghe cua suat chieu nay!');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSeatMessage = useCallback(
+    (event) => {
+      setSeatList((prev) =>
+        prev.map((s) => {
+          if (s.seatId === event.seatId) {
+            return {
+              ...s,
+              status: event.status,
+              heldByUserId: event.status === 'HOLDING' ? event.userId : null,
+            };
+          }
+          return s;
+        })
+      );
+    },
+    []
+  );
+
+  const { sendSeatAction } = useSeatWebSocket(
+    selectedShowtime?.id,
+    handleSeatMessage,
+    user
+  );
 
   const handleSeatClick = (seat) => {
-    if (seat.isTaken) return;
-    
-    setCartItems(prev => {
-      const exists = prev.find(item => item.id === `seat-${seat.id}`);
-      if (exists) {
-        return prev.filter(item => item.id !== `seat-${seat.id}`);
-      } else {
-        return [...prev, {
-          type: 'ticket',
-          id: `seat-${seat.id}`,
-          name: `Ticket • Seat ${seat.id}`,
-          price: TICKET_PRICE
-        }];
+    if (seat.status === 'BOOKED') return;
+
+    const isMine = cartItems.some((i) => i.id === `seat-${seat.seatId}`);
+
+    if (seat.status === 'HOLDING' && !isMine && seat.heldByUserId !== user?.id) {
+      alert(`Ghe ${seat.seatName} dang duoc khach hang khac giu!`);
+      return;
+    }
+
+    if (isMine) {
+      sendSeatAction(seat.seatId, seat.seatName, 'AVAILABLE');
+      setCartItems((prev) => prev.filter((i) => i.id !== `seat-${seat.seatId}`));
+    } else {
+      sendSeatAction(seat.seatId, seat.seatName, 'HOLDING');
+      setCartItems((prev) => [
+        ...prev,
+        {
+          id: `seat-${seat.seatId}`,
+          type: 'TICKET',
+          seatId: seat.seatId,
+          name: `Ve • Ghe ${seat.seatName} (${seat.type})`,
+          price: seat.price,
+        },
+      ]);
+    }
+  };
+
+  const handleAddSnack = (snack) => {
+    setCartItems((prev) => {
+      const existing = prev.find((i) => i.id === `snack-${snack.id}`);
+      if (existing) {
+        return prev.map((i) => (i.id === `snack-${snack.id}` ? { ...i, qty: i.qty + 1 } : i));
       }
+      return [...prev, { id: `snack-${snack.id}`, type: 'SNACK', snackId: snack.id, name: snack.name, price: snack.price, qty: 1 }];
     });
   };
 
-  const handleAddonClick = (addon) => {
-    setCartItems(prev => [...prev, {
-      type: 'addon',
-      id: `addon-${Date.now()}-${Math.random()}`,
-      name: addon.name,
-      price: addon.price
-    }]);
+  const handleRemoveCartItem = (itemId) => {
+    const item = cartItems.find((i) => i.id === itemId);
+    if (item && item.type === 'TICKET') {
+      const seat = seatList.find((s) => s.seatId === item.seatId);
+      if (seat) {
+        sendSeatAction(seat.seatId, seat.seatName, 'AVAILABLE');
+      }
+    }
+    setCartItems((prev) => prev.filter((i) => i.id !== itemId));
   };
 
-  const removeCartItem = (id) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
+  const subtotal = useMemo(() => {
+    return cartItems.reduce((sum, i) => sum + i.price * (i.qty || 1), 0);
+  }, [cartItems]);
+
+  const changeMoney = useMemo(() => {
+    const given = Number(cashGiven) || 0;
+    return given >= subtotal ? given - subtotal : 0;
+  }, [cashGiven, subtotal]);
+
+  const handleCheckout = () => {
+    if (cartItems.length === 0) return;
+
+    cartItems.forEach((item) => {
+      if (item.type === 'TICKET') {
+        const seat = seatList.find((s) => s.seatId === item.seatId);
+        if (seat) {
+          sendSeatAction(seat.seatId, seat.seatName, 'BOOKED');
+        }
+      }
+    });
+
+    const orderData = {
+      orderId: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
+      showtime: selectedShowtime,
+      items: [...cartItems],
+      total: subtotal,
+      paymentMethod,
+      time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setLastOrder(orderData);
+    setPrintTicketModal(true);
+    setCartItems([]);
+    setCashGiven('');
   };
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price, 0);
-  const tax = subtotal * 0.08;
-  const total = subtotal + tax;
+  const groupedByRow = useMemo(() => {
+    const acc = {};
+    seatList.forEach((seat) => {
+      if (!acc[seat.seatRow]) acc[seat.seatRow] = [];
+      acc[seat.seatRow].push(seat);
+    });
+    return acc;
+  }, [seatList]);
+
+  const sortedRows = Object.keys(groupedByRow).sort();
 
   return (
-    <div className="flex flex-col w-full h-full relative">
-      <div className="flex h-[calc(100vh-80px)] w-full overflow-hidden">
-        
-        {/* Left Panel: Movie & Showtime Selection / Seat Map */}
-        <div className="flex-1 overflow-y-auto bg-surface-container-lowest flex flex-col p-lg gap-xl custom-scrollbar relative">
-          
-          {!selectedMovie ? (
-            <>
-              {/* Date & Quick Filters */}
-              <div className="flex items-center justify-between sticky top-0 z-10 bg-surface-container-lowest/90 backdrop-blur-md pb-md border-b border-surface-container-highest">
-                <div className="flex items-center gap-md overflow-x-auto no-scrollbar py-sm">
-                  <button className="px-md py-sm rounded-full bg-primary text-on-primary font-label-caps text-label-caps shrink-0 shadow-sm transition-transform hover:scale-105">TODAY</button>
-                  <button className="px-md py-sm rounded-full bg-surface-container-highest text-on-surface hover:bg-surface-container-high font-label-caps text-label-caps shrink-0 transition-colors">TMRW</button>
-                  <button className="px-md py-sm rounded-full bg-surface-container-highest text-on-surface hover:bg-surface-container-high font-label-caps text-label-caps shrink-0 transition-colors">FRI 24</button>
-                  <button className="px-md py-sm rounded-full bg-surface-container-highest text-on-surface hover:bg-surface-container-high font-label-caps text-label-caps shrink-0 transition-colors">SAT 25</button>
+    <div className="flex flex-col w-full h-[calc(100vh-80px)] overflow-hidden bg-background">
+      <div className="flex h-full w-full overflow-hidden">
+        {/* Left Panel: Showtimes / Seat Map / Snacks */}
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar">
+          {!selectedShowtime ? (
+            <div>
+              <div className="flex items-center justify-between pb-4 mb-6 border-b border-surface-container-highest">
+                <div>
+                  <h1 className="text-2xl font-black text-on-surface">Ban Ve Quay POS</h1>
+                  <p className="text-on-surface-variant text-sm">Chon suat chieu de bat dau phuc vu khach hang.</p>
                 </div>
-                <div className="relative w-64">
-                  <span className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
-                  <input className="w-full bg-surface-container text-on-surface font-body-md text-body-md py-sm pl-xl pr-md rounded-lg focus:outline-none focus:ring-1 focus:ring-primary placeholder-on-surface-variant transition-all" placeholder="Search title..." type="text" />
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1.5 rounded-full bg-primary/10 text-primary font-bold text-xs border border-primary/20">
+                    CUM RAP #{cinemaId || 'N/A'}
+                  </span>
                 </div>
               </div>
 
-              {/* Movie Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-lg">
-                {MOVIES.map(movie => (
-                  <div key={movie.id} className="movie-card group flex flex-col gap-sm rounded-xl overflow-hidden bg-surface-container hover:bg-surface-container-high transition-all duration-300 shadow-sm hover:shadow-md">
-                    <div className="relative aspect-[2/3] w-full overflow-hidden">
-                      <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url('${movie.image}')` }}></div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent opacity-80"></div>
-                      {movie.badge && (
-                        <div className={`absolute top-sm right-sm font-label-caps text-[10px] px-sm py-xs rounded ${movie.badgeColor}`}>
-                          {movie.badge}
+              {loading ? (
+                <div className="text-center py-20 text-on-surface-variant">Dang tai du lieu suat chieu...</div>
+              ) : showtimes.length === 0 ? (
+                <div className="text-center py-20 text-on-surface-variant bg-surface-container/30 rounded-2xl">
+                  Chua co suat chieu nao hom nay cho cum rap nay.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {showtimes.map((st) => {
+                    const movie = movies.find((m) => m.id === st.movie?.id);
+                    return (
+                      <div
+                        key={st.id}
+                        onClick={() => fetchSeatsForShowtime(st)}
+                        className="group cursor-pointer bg-surface-container hover:bg-surface-container-high rounded-2xl p-5 border border-surface-container-highest transition-all duration-200 shadow-md hover:shadow-xl flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-start gap-4">
+                            <img
+                              src={movie?.posterUrl || 'https://via.placeholder.com/150'}
+                              alt={movie?.title}
+                              className="w-20 h-28 object-cover rounded-xl shadow-md shrink-0"
+                            />
+                            <div className="min-w-0">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-primary/20 text-primary">
+                                {st.room?.roomType || '2D'}
+                              </span>
+                              <h3 className="text-lg font-bold text-on-surface truncate mt-1 group-hover:text-primary transition-colors">
+                                {st.movie?.title || 'Phim'}
+                              </h3>
+                              <p className="text-xs text-on-surface-variant mt-0.5">{st.room?.name}</p>
+                              <p className="text-sm font-extrabold text-primary mt-2">
+                                {st.price?.toLocaleString('vi-VN')} d
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    <div className="p-md flex flex-col gap-xs">
-                      <h3 className="font-headline-md text-[18px] text-on-surface leading-tight truncate">{movie.title}</h3>
-                      <p className="font-body-md text-[14px] text-on-surface-variant">{movie.info}</p>
-                      <div className="flex flex-wrap gap-sm mt-sm">
-                        {movie.showtimes.map(time => {
-                          const disabled = time.includes('Sold Out');
-                          return (
-                            <button 
-                              key={time}
-                              disabled={disabled}
-                              onClick={() => handleShowtimeClick(movie, time)}
-                              className={`px-sm py-xs rounded bg-surface-container-highest font-button text-[12px] border border-transparent transition-colors
-                                ${disabled 
-                                  ? 'text-on-surface opacity-50 cursor-not-allowed' 
-                                  : 'text-on-surface hover:bg-primary hover:text-on-primary hover:border-primary'}`}
-                            >
-                              {time}
-                            </button>
-                          );
-                        })}
+
+                        <div className="mt-4 pt-3 border-t border-surface-container-highest/60 flex items-center justify-between">
+                          <span className="text-xs font-semibold text-on-surface-variant">Gio chieu:</span>
+                          <span className="px-3 py-1 rounded-lg bg-surface-container-highest text-on-surface font-black text-sm">
+                            {st.startTime ? new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           ) : (
-            /* Seat Map Section */
-            <div className="flex flex-col gap-lg bg-surface-container rounded-2xl p-xl shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-md">
-                  <button onClick={handleBackToMovies} className="p-sm rounded-full bg-surface-container-highest text-on-surface hover:bg-primary hover:text-on-primary transition-colors">
-                    <span className="material-symbols-outlined">arrow_back</span>
+            <div className="flex flex-col gap-6">
+              {/* Top Header of Seat View */}
+              <div className="flex items-center justify-between bg-surface-container/70 backdrop-blur-md rounded-2xl p-4 border border-surface-container-highest">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setSelectedShowtime(null);
+                      setCartItems([]);
+                    }}
+                    className="p-2 rounded-xl bg-surface-container-highest hover:bg-surface-bright text-on-surface transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                   </button>
                   <div>
-                    <h2 className="font-display-lg-mobile text-display-lg-mobile text-on-surface">Select Seats</h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">Screen 4 • {selectedShowtime}</p>
+                    <h2 className="text-lg font-bold text-on-surface">
+                      {selectedShowtime.movie?.title} • {selectedShowtime.room?.name}
+                    </h2>
+                    <p className="text-xs text-on-surface-variant">
+                      Suat: {selectedShowtime.startTime ? new Date(selectedShowtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''} • Gia goc: {selectedShowtime.price?.toLocaleString('vi-VN')} d
+                    </p>
                   </div>
                 </div>
-                <div className="flex gap-lg">
-                  <div className="flex items-center gap-xs"><div className="w-4 h-4 rounded-sm border border-on-surface-variant"></div><span className="font-label-caps text-[10px] text-on-surface-variant">AVAILABLE</span></div>
-                  <div className="flex items-center gap-xs"><div className="w-4 h-4 rounded-sm bg-secondary text-on-secondary flex items-center justify-center"><span className="material-symbols-outlined text-[12px]">done</span></div><span className="font-label-caps text-[10px] text-on-surface-variant">SELECTED</span></div>
-                  <div className="flex items-center gap-xs"><div className="w-4 h-4 rounded-sm bg-error-container text-on-error-container flex items-center justify-center"><span className="material-symbols-outlined text-[12px]">close</span></div><span className="font-label-caps text-[10px] text-on-surface-variant">TAKEN</span></div>
+
+                {/* Legend */}
+                <div className="flex items-center gap-4 flex-wrap text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded bg-surface-container-highest border border-surface-bright"></div>
+                    <span className="text-on-surface-variant">Trong</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded bg-primary text-on-primary flex items-center justify-center font-bold text-[10px]">✓</div>
+                    <span className="text-on-surface-variant">Ban chon</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded bg-amber-500/80 text-black flex items-center justify-center font-bold text-[10px]">H</div>
+                    <span className="text-on-surface-variant">Dang giu (5p)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded bg-[#222] text-on-surface-variant/40 flex items-center justify-center font-bold text-[10px]">✕</div>
+                    <span className="text-on-surface-variant">Da ban</span>
+                  </div>
                 </div>
               </div>
-              
-              {/* The Screen */}
-              <div className="w-full flex flex-col items-center mt-md mb-xl">
-                <div className="w-3/4 h-2 bg-gradient-to-b from-surface-bright to-transparent rounded-t-full shadow-[0_-10px_30px_rgba(255,255,255,0.1)]"></div>
-                <span className="font-label-caps text-[10px] text-on-surface-variant mt-sm tracking-[0.3em]">SCREEN</span>
-              </div>
-              
-              {/* Seats Grid */}
-              <div className="flex flex-col gap-sm items-center overflow-x-auto pb-lg no-scrollbar">
-                {seatRows.map((row) => (
-                  <div key={row.label} className="flex items-center gap-xs">
-                    <div className="w-6 text-center font-label-caps text-on-surface-variant mr-sm">{row.label}</div>
-                    <div className="flex gap-md">
-                      {row.blocks.map((block, bIdx) => (
-                        <div key={bIdx} className="flex gap-xs">
-                          {block.map(seat => {
-                            const isSelected = cartItems.some(i => i.id === `seat-${seat.id}`);
+
+              {/* Real Seat Map Grid */}
+              <div className="bg-surface-container/40 rounded-3xl p-6 border border-surface-container-highest flex flex-col items-center overflow-x-auto">
+                <div className="w-3/4 h-2 rounded-full bg-gradient-to-r from-transparent via-primary/50 to-transparent mb-2" />
+                <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-6">MAN CHIEU</p>
+
+                <div className="flex flex-col gap-2 min-w-max">
+                  {sortedRows.map((rowLabel) => (
+                    <div key={rowLabel} className="flex items-center gap-2">
+                      <span className="w-6 text-center text-xs font-bold text-on-surface-variant">{rowLabel}</span>
+                      <div className="flex gap-1.5">
+                        {groupedByRow[rowLabel]
+                          .sort((a, b) => a.seatColumn - b.seatColumn)
+                          .map((seat) => {
+                            const isMine = cartItems.some((i) => i.id === `seat-${seat.seatId}`);
+                            const isHoldingByOther = seat.status === 'HOLDING' && !isMine && seat.heldByUserId !== user?.id;
+                            const isBooked = seat.status === 'BOOKED';
+
+                            let bgClass = TYPE_COLOR[seat.type]?.bg || 'bg-surface-container-highest';
+                            let textClass = TYPE_COLOR[seat.type]?.text || 'text-on-surface';
+
+                            if (isBooked) {
+                              bgClass = 'bg-[#181818] border border-surface-container-highest cursor-not-allowed opacity-50';
+                              textClass = 'text-on-surface-variant/30';
+                            } else if (isMine) {
+                              bgClass = 'bg-primary text-on-primary ring-2 ring-primary-fixed shadow-lg shadow-primary/30';
+                              textClass = 'text-on-primary';
+                            } else if (isHoldingByOther) {
+                              bgClass = 'bg-amber-500 text-black animate-pulse cursor-not-allowed';
+                              textClass = 'text-black font-extrabold';
+                            }
+
                             return (
                               <button
-                                key={seat.id}
-                                disabled={seat.isTaken}
+                                key={seat.seatId}
+                                disabled={isBooked || isHoldingByOther}
                                 onClick={() => handleSeatClick(seat)}
-                                className={`seat-btn ${seat.isTaken ? 'seat-taken' : isSelected ? 'seat-selected' : 'seat-available'}`}
+                                title={`${seat.seatName} • ${seat.type} • ${seat.price?.toLocaleString('vi-VN')} d`}
+                                className={`w-8 h-8 rounded-lg text-xs font-bold transition-all duration-150 relative flex items-center justify-center ${bgClass} ${textClass}`}
                               >
-                                {seat.isTaken ? (
-                                  <span className="material-symbols-outlined text-[14px]">close</span>
-                                ) : isSelected ? (
-                                  <span className="material-symbols-outlined text-[16px]">done</span>
-                                ) : (
-                                  seat.id
-                                )}
+                                {isBooked ? '✕' : isMine ? '✓' : isHoldingByOther ? 'H' : seat.seatColumn}
                               </button>
                             );
                           })}
-                        </div>
-                      ))}
+                      </div>
+                      <span className="w-6 text-center text-xs font-bold text-on-surface-variant">{rowLabel}</span>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+
+              {/* F&B Snacks Section */}
+              <div className="bg-surface-container/70 rounded-2xl p-5 border border-surface-container-highest">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-[20px]">fastfood</span>
+                  Combo Bap Nuoc Uu Dai
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {SNACKS.map((snack) => (
+                    <div
+                      key={snack.id}
+                      onClick={() => handleAddSnack(snack)}
+                      className="cursor-pointer bg-surface-container-highest hover:bg-surface-bright rounded-xl p-3 border border-surface-container-highest transition-all text-center flex flex-col justify-between shadow-sm active:scale-95"
+                    >
+                      <div>
+                        <span className="material-symbols-outlined text-3xl text-amber-400 mb-1">{snack.icon}</span>
+                        <p className="text-xs font-bold text-on-surface line-clamp-1">{snack.name}</p>
+                        <p className="text-[10px] text-on-surface-variant line-clamp-1">{snack.desc}</p>
+                      </div>
+                      <p className="text-xs font-black text-primary mt-2">{snack.price.toLocaleString('vi-VN')} d</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Right Panel: Cart & Checkout */}
-        <div className="w-96 bg-surface flex flex-col shadow-xl z-20 border-l border-surface-container-highest">
-          <div className="p-lg bg-surface-container-lowest flex flex-col gap-sm">
-            <h2 className="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
-              <span className="material-symbols-outlined text-primary">receipt_long</span> Current Order
-            </h2>
-            <p className="font-body-md text-[14px] text-on-surface-variant">Order #9942 • Counter 2</p>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-lg flex flex-col gap-md custom-scrollbar bg-surface/50">
-            <div className="flex flex-col gap-sm">
-              {cartItems.length === 0 ? (
-                <div className="text-center py-xl text-on-surface-variant font-body-md italic">No items selected yet.</div>
-              ) : (
-                cartItems.map(item => {
-                  const isTicket = item.type === 'ticket';
-                  const icon = isTicket ? 'confirmation_number' : 'fastfood';
-                  const colorClass = isTicket ? 'text-primary' : 'text-secondary-fixed';
-                  return (
-                    <div key={item.id} className="flex justify-between items-center bg-surface-container rounded-lg p-sm pl-md border border-surface-container-highest shadow-sm group">
-                      <div className="flex items-center gap-sm">
-                        <span className={`material-symbols-outlined ${colorClass} text-[18px]`}>{icon}</span>
-                        <span className="font-button text-[13px] text-on-surface">{item.name}</span>
-                      </div>
-                      <div className="flex items-center gap-sm">
-                        <span className="font-body-md text-[13px] text-on-surface-variant">${item.price.toFixed(2)}</span>
-                        <button 
-                          onClick={() => removeCartItem(item.id)}
-                          className="text-error hover:text-error-container p-xs rounded-full hover:bg-surface-container-highest transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100"
-                        >
-                          <span className="material-symbols-outlined text-[16px]">delete</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
+        {/* Right Panel: Cart & Checkout Billing */}
+        <div className="w-96 bg-surface-container/90 backdrop-blur-xl flex flex-col border-l border-surface-container-highest shadow-2xl z-20">
+          <div className="p-5 bg-surface-container-lowest border-b border-surface-container-highest flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">receipt_long</span> Don Hang Hien Tai
+              </h2>
+              <p className="text-xs text-on-surface-variant">Thu Ngan: {user?.username || 'Staff'}</p>
             </div>
-            
-            {/* Add-ons Section */}
-            <div className="mt-xl pt-lg border-t border-surface-container-highest">
-              <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-md tracking-wider">QUICK ADD-ONS</h3>
-              <div className="grid grid-cols-2 gap-sm">
-                {ADDONS.map(addon => (
-                  <button 
-                    key={addon.id}
-                    onClick={() => handleAddonClick(addon)}
-                    className="flex flex-col items-center justify-center gap-xs p-md bg-surface-container rounded-lg hover:bg-surface-container-high transition-colors shadow-sm"
-                  >
-                    <span className={`material-symbols-outlined ${addon.color} text-[32px]`}>{addon.icon}</span>
-                    <span className="font-button text-[12px] text-on-surface">{addon.name}</span>
-                    <span className="font-body-md text-[12px] text-on-surface-variant">${addon.price.toFixed(2)}</span>
-                  </button>
-                ))}
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container-highest text-on-surface font-bold text-xs">
+              {cartItems.length} muc
+            </span>
+          </div>
+
+          {/* Cart Item List */}
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2 custom-scrollbar">
+            {cartItems.length === 0 ? (
+              <div className="text-center py-20 text-on-surface-variant text-sm italic">
+                Chua co ve hoac bap nuoc nao duoc chon.
               </div>
-            </div>
+            ) : (
+              cartItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-3 rounded-xl bg-surface-container border border-surface-container-highest shadow-sm"
+                >
+                  <div className="min-w-0 flex-1 pr-2">
+                    <p className="text-xs font-bold text-on-surface truncate">{item.name}</p>
+                    <p className="text-xs text-primary font-black mt-0.5">
+                      {(item.price * (item.qty || 1)).toLocaleString('vi-VN')} d
+                      {item.qty > 1 && <span className="text-[10px] text-on-surface-variant font-normal"> (x{item.qty})</span>}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveCartItem(item.id)}
+                    className="p-1 rounded-lg hover:bg-surface-container-highest text-on-surface-variant hover:text-red-400 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+              ))
+            )}
           </div>
-          
-          {/* Totals & Actions */}
-          <div className="bg-surface-container-lowest p-lg shadow-[0_-4px_20px_rgba(0,0,0,0.2)] z-30">
-            <div className="flex justify-between items-center mb-sm">
-              <span className="font-body-md text-on-surface-variant">Subtotal</span>
-              <span className="font-body-md text-on-surface">${subtotal.toFixed(2)}</span>
+
+          {/* Checkout Section */}
+          <div className="p-5 bg-surface-container-lowest border-t border-surface-container-highest flex flex-col gap-3">
+            <div className="flex justify-between items-end pb-2 border-b border-surface-container-highest">
+              <span className="text-xs uppercase font-bold text-on-surface-variant">Tong thanh toan</span>
+              <span className="text-2xl font-black text-primary">{subtotal.toLocaleString('vi-VN')} d</span>
             </div>
-            <div className="flex justify-between items-center mb-lg">
-              <span className="font-body-md text-on-surface-variant">Tax (8%)</span>
-              <span className="font-body-md text-on-surface">${tax.toFixed(2)}</span>
+
+            {/* Payment Method Selector */}
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: 'CASH', label: 'Tien Mat', icon: 'payments' },
+                { id: 'CARD', label: 'The POS', icon: 'credit_card' },
+                { id: 'QR', label: 'Quet QR', icon: 'qr_code_2' },
+              ].map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setPaymentMethod(m.id)}
+                  className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-xs font-bold transition-all border ${
+                    paymentMethod === m.id
+                      ? 'bg-primary/20 border-primary text-primary shadow-sm'
+                      : 'bg-surface-container border-transparent text-on-surface-variant hover:bg-surface-container-high'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[18px]">{m.icon}</span>
+                  {m.label}
+                </button>
+              ))}
             </div>
-            <div className="flex justify-between items-end mb-xl border-t border-surface-container-highest pt-sm">
-              <span className="font-headline-md text-[18px] text-on-surface uppercase tracking-wide">Total</span>
-              <span className="font-display-lg-mobile text-[36px] text-primary leading-none">${total.toFixed(2)}</span>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-sm mb-lg">
-              <button className="py-md bg-surface-container rounded-lg flex flex-col items-center gap-xs hover:bg-surface-container-high hover:text-primary transition-all text-on-surface shadow-sm">
-                <span className="material-symbols-outlined">payments</span>
-                <span className="font-label-caps text-[10px]">CASH</span>
-              </button>
-              <button className="py-md bg-surface-container rounded-lg flex flex-col items-center gap-xs hover:bg-surface-container-high hover:text-primary transition-all text-on-surface shadow-sm">
-                <span className="material-symbols-outlined">credit_card</span>
-                <span className="font-label-caps text-[10px]">CARD</span>
-              </button>
-              <button className="py-md bg-surface-container rounded-lg flex flex-col items-center gap-xs hover:bg-surface-container-high hover:text-primary transition-all text-on-surface shadow-sm">
-                <span className="material-symbols-outlined">qr_code_scanner</span>
-                <span className="font-label-caps text-[10px]">QR PAY</span>
-              </button>
-            </div>
-            
-            <button 
+
+            {/* Cash Given Input */}
+            {paymentMethod === 'CASH' && (
+              <div className="flex flex-col gap-1 mt-1">
+                <div className="flex items-center justify-between text-xs font-bold text-on-surface-variant">
+                  <span>Tien khach dua:</span>
+                  <input
+                    type="number"
+                    value={cashGiven}
+                    onChange={(e) => setCashGiven(e.target.value)}
+                    placeholder="VD: 200000"
+                    className="w-28 bg-surface-container rounded-lg px-2 py-1 text-right text-on-surface font-bold border border-surface-container-highest focus:border-primary focus:outline-none"
+                  />
+                </div>
+                {Number(cashGiven) > 0 && (
+                  <div className="flex items-center justify-between text-xs font-bold text-green-400">
+                    <span>Tien thoi lai:</span>
+                    <span>{changeMoney.toLocaleString('vi-VN')} d</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button
               disabled={cartItems.length === 0}
-              className="w-full py-md bg-primary text-on-primary font-button text-[16px] rounded-lg shadow-lg hover:shadow-xl hover:bg-primary-container transition-all flex justify-center items-center gap-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleCheckout}
+              className="w-full py-3.5 mt-2 rounded-xl bg-primary text-on-primary hover:bg-primary-fixed font-black text-sm shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
             >
-              <span className="material-symbols-outlined">print</span>
-              PRINT TICKETS
+              <span className="material-symbols-outlined text-[20px]">print</span>
+              THANH TOAN VA IN VE
             </button>
           </div>
         </div>
       </div>
+
+      {/* Ticket Print Modal */}
+      {printTicketModal && lastOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" onClick={() => setPrintTicketModal(false)} />
+          <div className="relative bg-surface rounded-3xl p-6 w-full max-w-sm border border-surface-container-highest shadow-2xl flex flex-col gap-4 text-on-surface">
+            <div className="text-center pb-3 border-b border-dashed border-surface-container-highest">
+              <h3 className="text-xl font-black text-primary uppercase">Ve Xem Phim CGV</h3>
+              <p className="text-xs text-on-surface-variant">Ma don: {lastOrder.orderId} • {lastOrder.time}</p>
+            </div>
+
+            <div className="flex flex-col gap-1.5 text-xs">
+              <p><span className="text-on-surface-variant">Phim:</span> <strong className="text-on-surface">{lastOrder.showtime?.movie?.title}</strong></p>
+              <p><span className="text-on-surface-variant">Phong:</span> {lastOrder.showtime?.room?.name} ({lastOrder.showtime?.room?.roomType})</p>
+              <p><span className="text-on-surface-variant">Gio chieu:</span> {lastOrder.showtime?.startTime ? new Date(lastOrder.showtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}</p>
+              <div className="mt-2 pt-2 border-t border-surface-container-highest/60">
+                <span className="text-on-surface-variant">Chi tiet:</span>
+                {lastOrder.items.map((i) => (
+                  <div key={i.id} className="flex justify-between font-bold text-xs py-0.5">
+                    <span>{i.name}</span>
+                    <span>{(i.price * (i.qty || 1)).toLocaleString('vi-VN')} d</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2 pt-2 border-t border-surface-container-highest flex justify-between text-sm font-black text-primary">
+                <span>TONG TIEN:</span>
+                <span>{lastOrder.total.toLocaleString('vi-VN')} d</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center justify-center py-3 bg-surface-container rounded-2xl border border-surface-container-highest">
+              <span className="material-symbols-outlined text-5xl text-on-surface mb-1">qr_code_2</span>
+              <span className="text-[10px] tracking-widest text-on-surface-variant uppercase">{lastOrder.orderId}</span>
+            </div>
+
+            <button
+              onClick={() => setPrintTicketModal(false)}
+              className="w-full py-2.5 rounded-xl bg-primary text-on-primary font-bold text-sm shadow-md"
+            >
+              HOAN TAT
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
