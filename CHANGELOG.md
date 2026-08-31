@@ -2,9 +2,9 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [31-08-2026 12:32] - Cập Nhật README.md Chuẩn Công Nghiệp
+## [31-08-2026 12:38] - Tái Cấu Trúc README.md Thành Bản Đặc Tả Yêu Cầu Hệ Thống & Nghiệp Vụ (SRS)
 ### Changed (Thay đổi)
-- `README.md`: Viết lại toàn bộ tài liệu dự án theo chuẩn doanh nghiệp (Architecture Mermaid, Redis Distributed Lock, WebSocket STOMP Realtime, Batch Showtime Generator Wizard, Dual-Theme Specifications và hướng dẫn cài đặt chi tiết).
+- `README.md`: Chuyển đổi toàn bộ nội dung sang cấu trúc Bản Đặc Tả Yêu Cầu Phần Mềm (Software Requirements Specification - SRS): Danh mục Yêu cầu Chức năng (`REQ-FR-xx`), Yêu cầu Phi Chức năng (`REQ-NFR-xx`), Chu trình sống của ghế (Seat State Machine), Ma trận phân quyền RBAC và Ngăn xếp kiến trúc hệ thống, đồng thời bảo mật tuyệt đối không in thông tin cấu hình nhạy cảm.
 
 ## [31-08-2026 12:22] - Thiết Kế Lại Giao Diện Admin & Manager Sang Phong Cách Enterprise Office Portal
 ### Changed (Thay đổi)
