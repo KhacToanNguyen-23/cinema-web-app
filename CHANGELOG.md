@@ -2,6 +2,10 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [31-08-2026 12:32] - Cập Nhật README.md Chuẩn Công Nghiệp
+### Changed (Thay đổi)
+- `README.md`: Viết lại toàn bộ tài liệu dự án theo chuẩn doanh nghiệp (Architecture Mermaid, Redis Distributed Lock, WebSocket STOMP Realtime, Batch Showtime Generator Wizard, Dual-Theme Specifications và hướng dẫn cài đặt chi tiết).
+
 ## [31-08-2026 12:22] - Thiết Kế Lại Giao Diện Admin & Manager Sang Phong Cách Enterprise Office Portal
 ### Changed (Thay đổi)
 - `docs/DESIGN.md`: Bổ sung kiến trúc thiết kế kép (Dual-Theme Architecture) và bảng màu chuẩn Modern Enterprise SaaS cho phân hệ Quản trị.

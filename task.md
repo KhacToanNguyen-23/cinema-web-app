@@ -1,8 +1,5 @@
-# Nhiệm vụ: Thiết Kế Lại Giao Diện Admin/Manager Sang Phong Cách Enterprise Office Portal
+# Nhiệm vụ: Viết Lại File README.md Chuẩn Công Nghiệp
 
 - [x] Lập Implementation Plan và chờ phê duyệt <!-- id: 0 -->
-- [x] Thiết kế lại Khung Layout Quản trị: `DashboardLayout.jsx`, `Sidebar.jsx`, `DashboardHeader.jsx` <!-- id: 1 -->
-- [x] Chuyển đổi giao diện trang Quản Lý Suất Chiếu `AdminShowtimePage.jsx` sang Theme Văn Phòng <!-- id: 2 -->
-- [x] Chuyển đổi giao diện `AdminCinemaPage.jsx` và `AdminRoomPage.jsx` sang Theme Văn Phòng <!-- id: 3 -->
-- [x] Chuyển đổi giao diện `AdminSeatPage.jsx`, `AdminMoviePage.jsx`, `UserManagementPage.jsx` <!-- id: 4 -->
-- [x] Chạy build kiểm tra toàn vẹn Frontend và cập nhật CHANGELOG.md <!-- id: 5 -->
+- [x] Soạn thảo và cập nhật toàn bộ nội dung file `README.md` theo chuẩn Enterprise/Open-Source <!-- id: 1 -->
+- [x] Kiểm tra tính chính xác và đẩy lên GitHub <!-- id: 2 -->
