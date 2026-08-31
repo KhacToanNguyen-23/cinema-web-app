@@ -25,6 +25,12 @@ public class RoomServiceImpl implements RoomService {
         Cinema cinema = cinemaRepository.findById(room.getCinema().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Cinema not found"));
         
+        // [AI UPDATE - Kiem tra chong trung ten phong trong cung mot cum rap]
+        if (roomRepository.existsByCinemaIdAndNameIgnoreCaseAndIsActiveTrue(cinema.getId(), room.getName().trim())) {
+            throw new IllegalArgumentException("Tên phòng [" + room.getName() + "] đã tồn tại trong cụm rạp này!");
+        }
+
+        room.setName(room.getName().trim());
         room.setCinema(cinema);
         room.setActive(true);
         return roomRepository.save(room);

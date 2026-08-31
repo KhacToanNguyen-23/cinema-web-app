@@ -1,6 +1,5 @@
 package com.cinema.entity;
 
-import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
@@ -15,13 +14,20 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    
     @Column(nullable = false)
     @NotEmpty
     private String name;
-    private boolean isActive;
+    
+    private boolean isActive = true;
+    
     @ManyToOne
     @JoinColumn(name = "cinema_id")
     private Cinema cinema;
+    
     private int capacity;
-    private String roomType;
+    
+    // [AI UPDATE - Chuyen doi roomType sang kieu Enum RoomType type-safe]
+    @Enumerated(EnumType.STRING)
+    private RoomType roomType = RoomType.STANDARD;
 }

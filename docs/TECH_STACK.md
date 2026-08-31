@@ -50,3 +50,16 @@ Khi làm việc với Frontend, tuyệt đối tuân thủ cấu trúc thư mụ
 - `repository`: Giao tiếp DB (Interface kế thừa `JpaRepository`).
 - `service`: Chứa logic nghiệp vụ.
 - `controller`: Chứa API Endpoints.
+
+### E. Xử lý lỗi tập trung (Error Handling & API)
+- **CẤM:** NGHIÊM CẤM dùng try-catch để trả về HTTP Response rải rác trong Controller.
+- **BẮT BUỘC:** Mọi lỗi phải được 	hrow ra ngoài và xử lý tại GlobalExceptionHandler.
+- **API Response Format:** Mọi API (cả thành công lẫn thất bại) ĐỀU PHẢI bọc trong một format duy nhất để Frontend dễ xử lý:
+  ```json
+  {
+    "status": 200,
+    "message": "Success",
+    "data": { ... }
+  }
+  ```
+

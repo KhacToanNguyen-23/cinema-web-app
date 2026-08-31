@@ -1,24 +1,8 @@
-# Danh sách công việc (Task List)
+# Nhiệm vụ: Thiết Kế Lại Giao Diện Admin/Manager Sang Phong Cách Enterprise Office Portal
 
-- `[x]` Xây dựng trang Landing Page và Search Film
-- `[x]` Áp dụng Design System (Cinematic Noir) và xây dựng Admin/Staff layout
-- `[x]` Triển khai xác thực JWT (JWT Authentication)
-- `[x]` Xây dựng CRUD Quản lý Người dùng (User Management)
-
----
-
-## ROADMAP: CORE BOOKING FLOW
-
-- `[]` Giai đoạn 1: Master Data (Dữ liệu nền tảng)
-  - `[x]` CRUD Quản lý Phim (Movie)
-  - `[ ]` Cấu trúc Rạp (Cinema) & Phòng chiếu (Room)
-  - `[ ]` Khởi tạo Sơ đồ ghế (Seat) cho Phòng chiếu
-- `[ ]` Giai đoạn 2: Lịch chiếu (Showtime)
-  - `[ ]` Giao diện xếp lịch chiếu (Admin)
-  - `[ ]` Logic sinh tự động trạng thái ghế (BookingSeat) khi tạo lịch
-- `[ ]` Giai đoạn 3: Luồng Đặt Vé Khách Hàng (Customer Booking Flow)
-  - `[ ]` Hiển thị & Lọc Lịch chiếu trên Frontend
-  - `[ ]` Giao diện Sơ đồ ghế & Logic chọn ghế thực tế (Booking Page)
-  - `[ ]` Chọn Bắp nước (Snack)
-  - `[ ]` Thanh toán & Tạo hóa đơn (Checkout)
-  - `[ ]` Cấp mã vé QR và hiển thị Lịch sử giao dịch
+- [x] Lập Implementation Plan và chờ phê duyệt <!-- id: 0 -->
+- [x] Thiết kế lại Khung Layout Quản trị: `DashboardLayout.jsx`, `Sidebar.jsx`, `DashboardHeader.jsx` <!-- id: 1 -->
+- [x] Chuyển đổi giao diện trang Quản Lý Suất Chiếu `AdminShowtimePage.jsx` sang Theme Văn Phòng <!-- id: 2 -->
+- [x] Chuyển đổi giao diện `AdminCinemaPage.jsx` và `AdminRoomPage.jsx` sang Theme Văn Phòng <!-- id: 3 -->
+- [x] Chuyển đổi giao diện `AdminSeatPage.jsx`, `AdminMoviePage.jsx`, `UserManagementPage.jsx` <!-- id: 4 -->
+- [x] Chạy build kiểm tra toàn vẹn Frontend và cập nhật CHANGELOG.md <!-- id: 5 -->

@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
@@ -15,9 +15,10 @@ export const useSeatWebSocket = (showtimeId, onSeatMessageReceived, currentUser)
   useEffect(() => {
     if (!showtimeId) return;
 
-    // Khoi tao STOMP Client su dung SockJS lam giao thuc van chuyen
+    // [AI UPDATE - Su dung bien moi truong VITE_WS_BASE_URL thay vi hardcode localhost]
+    const wsUrl = import.meta.env.VITE_WS_BASE_URL || 'http://localhost:8080/ws';
     const client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      webSocketFactory: () => new SockJS(wsUrl),
       reconnectDelay: 5000, // Tu dong ket noi lai sau 5s neu mat ket noi
       debug: () => {
         // Co the mo log debug khi can kiem tra chi tiet

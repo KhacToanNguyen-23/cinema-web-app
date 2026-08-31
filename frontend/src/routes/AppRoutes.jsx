@@ -4,6 +4,8 @@ import AdminLayout from '../layouts/AdminLayout';
 import StaffLayout from '../layouts/StaffLayout';
 import LandingPage from '../pages/client/LandingPage';
 import SearchPage from '../pages/client/SearchPage';
+import MovieDetailPage from '../pages/client/MovieDetailPage';
+import BookingSeatPage from '../pages/client/BookingSeatPage';
 import AdminMoviePage from '../pages/admin/AdminMoviePage';
 import AdminShowtimePage from '../pages/admin/AdminShowtimePage';
 import AdminCinemaPage from '../pages/admin/AdminCinemaPage';
@@ -20,7 +22,11 @@ const AppRoutes = () => {
       <Route path="/" element={<ClientLayout />}>
         <Route index element={<LandingPage />} />
         <Route path="search" element={<SearchPage />} />
+        {/* [AI UPDATE - Dang ky route Chi tiet phim & Dat ve Realtime cho Khach hang Online] */}
+        <Route path="movies/:id" element={<MovieDetailPage />} />
+        <Route path="booking/:showtimeId" element={<BookingSeatPage />} />
       </Route>
+
       
       <Route path="/login" element={<LoginPage />} />
 

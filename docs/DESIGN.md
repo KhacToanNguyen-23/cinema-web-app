@@ -1,45 +1,75 @@
-# Tài liệu Quy chuẩn Thiết kế UI (Design System - Cinema Web App)
+# Tài liệu Quy chuẩn Thiết kế Giao diện (Design System - Cinema Web App)
 
-## 1. Triết lý thiết kế (Design Concept)
-- **Cinematic Experience:** Giao diện lấy cảm hứng từ rạp chiếu phim thực tế. Mặc định sử dụng **Dark Mode** (Nền tối) để làm nổi bật các Poster phim và mang lại cảm giác đắm chìm (immersive).
-- **Image-Heavy:** Sử dụng nhiều hình ảnh độ phân giải cao (Banner, Poster, Trailer). Các phần tử UI khác phải được thiết kế tối giản để không tranh giành sự chú ý với hình ảnh phim.
+Dự án áp dụng **Kiến trúc Thiết kế Kép (Dual-Theme Architecture)** nhằm phục vụ tối ưu cho 2 đối tượng người dùng với 2 mục đích hoàn toàn khác biệt:
 
-## 2. Bảng màu chủ đạo (Color Palette)
-- **Background (Nền):** 
-  - Đen tuyền: `#000000` (Cho nền chính)
-  - Xám đậm: `#141414` hoặc `#1A1A1A` (Cho các Section hoặc Card)
-- **Primary Color (Màu nhấn chính):**
-  - Đỏ rạp phim (CGV/Netflix Red): `#E50914` hoặc `#D22027`. Dùng cho nút bấm chính (Book Ticket), viền active.
-- **Text Color (Màu chữ):**
-  - Text chính: `#FFFFFF` (Trắng)
-  - Text phụ (Mô tả, ngày tháng): `#B3B3B3` hoặc `#A1A1A1`
-- **Semantic Colors (Màu trạng thái - Rất quan trọng cho sơ đồ ghế):**
-  - Ghế đang chọn (Selecting): Xanh lá cây `#4CAF50` hoặc viền đỏ.
-  - Ghế đã bán (Booked): Xám mờ `#555555` (Disable).
-  - Ghế VIP: Vàng Gold `#FFD700`.
+---
 
-## 3. Typography (Phông chữ)
-- **Font chữ chính:** `Montserrat` hoặc `Inter` (Sans-serif hiện đại, dễ đọc, phù hợp với số và giá tiền).
-- **Tiêu đề (H1, H2):** In đậm (Bold), có thể viết hoa (Uppercase) đối với Tên Phim.
-- **Đoạn văn (Body):** Regular (Cỡ chữ 14px - 16px).
+## 🏛️ TỔNG QUAN: KIẾN TRÚC THIẾT KẾ KÉP (Dual-Theme System)
 
-## 4. Quy chuẩn các thành phần UI (Components)
-### A. Nút bấm (Buttons)
-- **Primary Button:** Nền Đỏ (`#E50914`), chữ trắng, bo góc vừa phải (Border-radius: 4px hoặc 8px). Khi hover có hiệu ứng sáng lên (Glow).
-- **Secondary Button:** Nền trong suốt (Transparent), viền trắng hoặc xám.
+| Phân hệ | Đối tượng | Phong cách Thiết kế | Tông màu Chủ đạo | Mục tiêu Cốt lõi |
+| :--- | :--- | :--- | :--- | :--- |
+| **Client Site** (Khách hàng) | Người xem phim | **Cinematic Dark Mode** (Rạp phim huyền bí) | Nền đen tuyền (`#000000`), Nâu xám (`#141414`), Đỏ / Vàng rực rỡ | Tạo cảm xúc đắm chìm, nổi bật poster, kích thích trải nghiệm xem phim. |
+| **Management Portal** (Admin & Manager) | Quản lý rạp, Ban quản trị | **Modern Enterprise Office Portal** (SaaS Công sở Sáng) | Nền xám dịu (`#F8FAFC`), Thẻ trắng (`#FFFFFF`), Xanh dương công sở (`#2563EB`) | Năng suất làm việc cao, độ tương phản sắc nét, giảm mỏi mắt khi nhập liệu 8h/ngày. |
 
-### B. Thẻ Phim (Movie Cards)
-- Tỉ lệ ảnh (Aspect Ratio): **2:3** (Tỉ lệ chuẩn của Poster phim dọc).
-- **Hiệu ứng Hover:** Khi trỏ chuột vào card, hình ảnh zoom nhẹ (scale 1.05), xuất hiện lớp phủ (overlay) màu đen mờ kèm nút "Đặt vé" hoặc "Xem Trailer".
+---
 
-### C. Giao diện chọn ghế (Seat Selection Layout)
-- Cần có mô phỏng **Màn hình chiếu** (Screen) ở phía trên cùng, dạng đường cong.
-- Lưới ghế (Grid) chia đều, có đánh số (A1, A2...) hoặc chú thích màu rõ ràng.
+## 🌓 PHẦN A: QUY CHUẨN DESIGN CHO PHÂN HỆ QUẢN TRỊ (Admin & Manager Portal)
 
-### D. Header & Navigation
-- Navbar dính (Sticky Header).
-- Khi ở đầu trang (Top), nền Navbar trong suốt. Khi cuộn trang (Scroll), Navbar chuyển sang màu nền Đen mờ (Kính mờ - Backdrop blur) để đọc chữ dễ hơn.
+### 1. Triết lý Thiết kế (Design Philosophy)
+- **Data-Dense & Clean:** Tối ưu hóa mật độ hiển thị thông tin nhưng vẫn giữ độ thoáng ("breathable"), số liệu rõ nét, không dùng hiệu ứng bóng mờ rườm rà.
+- **High Contrast & Readability:** Chữ đen đậm trên nền trắng/xám giúp quản lý đọc số liệu, lịch chiếu và ma trận ghế nhanh chóng, không bị chói mắt trong môi trường văn phòng ban ngày.
+- **Modern Enterprise SaaS:** Lấy cảm hứng từ các phần mềm quản trị doanh nghiệp hàng đầu thế giới (Linear, Stripe Dashboard, Jira, Notion).
 
-## 5. Layout & Grid
-- Chiều rộng tối đa (Max-width) cho Container: `1200px` hoặc `1440px`.
-- Khoảng cách (Spacing) rộng rãi, tạo độ "thở" giữa các cụm phim Đang chiếu / Sắp chiếu.
+### 2. Bảng Màu Chuẩn (Color Palette - Office Portal)
+- **Nền Làm Việc (Workspace Background):** `#F8FAFC` (`bg-slate-50`) hoặc `#F1F5F9` (`bg-slate-100/60`).
+- **Thẻ Dữ Liệu & Container (Cards & Panels):** `#FFFFFF` (`bg-white`), bo góc nhẹ (`rounded-xl`), viền mỏng (`border border-slate-200/80`), đổ bóng nhẹ (`shadow-sm`).
+- **Thanh Điều Hướng (Sidebar):** Tone màu Dark Navy Slate (`#0F172A` - `bg-slate-900`) hoặc Clean White (`#FFFFFF`).
+- **Thanh Tiêu Đề (Topbar / Header):** `#FFFFFF` (`bg-white/95 backdrop-blur`), viền dưới `#E2E8F0` (`border-b border-slate-200`).
+- **Màu Nhấn Hành Động (Primary Accent):**
+  - Xanh dương công sở (Business Blue): `#2563EB` (`bg-blue-600 hover:bg-blue-700 text-white`). Dùng cho nút bấm chính (Thêm mới, Lưu, Xác nhận).
+- **Màu Chữ (Typography Contrast):**
+  - Chữ chính (Headings, Values): `#0F172A` (`text-slate-900` - Đen xám đậm).
+  - Chữ phụ (Labels, Metadata): `#64748B` (`text-slate-500` - Xám trung tính).
+- **Màu Trạng Thái (Semantic Status Badges):**
+  - **Hoạt động / Thành công (Active):** Nền xanh nhạt `#ECFDF5`, chữ xanh `#047857`, viền `#A7F3D0`.
+  - **Tạm dừng / Vô hiệu hóa (Inactive):** Nền xám `#F1F5F9`, chữ xám `#475569`, viền `#CBD5E1`.
+  - **Cảnh báo / Trùng lịch (Warning/Conflict):** Nền đỏ nhạt `#FEF2F2`, chữ đỏ `#B91C1C`, viền `#FECACA`.
+  - **VIP / Nổi bật:** Nền vàng cam nhạt `#FFFBEB`, chữ vàng nâu `#B45309`, viền `#FDE68A`.
+
+### 3. Quy chuẩn Các Thành Phần Giao Diện Quản Trị (Components)
+
+#### A. Nút Bấm (Buttons)
+- **Primary Button:** `bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition-all`.
+- **Secondary Button:** `bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold px-4 py-2 rounded-lg shadow-sm`.
+- **Danger Button:** `bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-semibold px-3 py-1.5 rounded-lg`.
+
+#### B. Bảng Dữ Liệu (Data Tables)
+- **Header Bảng:** Nền xám nhạt (`bg-slate-50` hoặc `bg-slate-100/70`), chữ hoa in nhỏ (`text-xs uppercase font-semibold text-slate-500`).
+- **Hàng (Rows):** Nền trắng, phân tách bằng đường kẻ thanh mảnh (`divide-y divide-slate-100`).
+- **Hiệu ứng Hover:** `hover:bg-blue-50/40` giúp nhận diện dòng đang trỏ chuột.
+
+#### C. Ô Nhập Liệu (Form Controls & Inputs)
+- Nền trắng (`bg-white`), viền xám (`border border-slate-300`), chữ đen (`text-slate-900`).
+- Khi Focus: Viền xanh dương sắc nét (`focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`).
+
+---
+
+## 🎬 PHẦN B: QUY CHUẨN DESIGN CHO PHÂN HỆ KHÁCH HÀNG (Client Site)
+
+### 1. Triết lý Thiết kế (Design Philosophy)
+- **Cinematic Experience:** Nền tối huyền bí (Dark Mode) làm nền tảng cho poster phim và video trailer phát sáng.
+- **Image-Heavy:** Sử dụng poster tỉ lệ chuẩn **2:3**, hiệu ứng chuyển động mượt mà khi hover.
+
+### 2. Bảng Màu Chuẩn (Color Palette - Client Movie Site)
+- **Background chính:** `#000000` (Đen tuyền) và `#0B0F19` (Slate 950).
+- **Cards & Containers:** `#111827` (Slate 900) viền `#1F2937` (Slate 800).
+- **Primary Accent:** Vàng hổ phách `#F59E0B` (Amber 500) hoặc Đỏ rạp phim `#E50914`.
+- **Text:** Trắng tuyền `#FFFFFF` (Tiêu đề) và Xám bạc `#94A3B8` (Nội dung mô tả).
+
+### 3. Sơ Đồ Chọn Ghế (Seat Matrix)
+- Mô phỏng màn hình chiếu cong phát sáng (Curved Screen Glow).
+- Ghế Thường: Viền xám mờ `#334155`.
+- Ghế VIP: Vàng Gold `#F59E0B`.
+- Ghế Couple: Hồng tím `#EC4899`.
+- Ghế Đang Chọn: Xanh phát sáng `#22C55E`.
+- Ghế Đã Bán: Xám tối `#1E293B` (Vô hiệu hóa).

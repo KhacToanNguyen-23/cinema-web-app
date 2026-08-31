@@ -1,44 +1,44 @@
-﻿import React, { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { seatApi } from "../../api/seatApi";
-import { roomApi } from "../../api/roomApi";
+// [AI UPDATE - Chuyen doi AdminSeatPage sang phong cach Modern Enterprise Office Portal]
+import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { seatApi } from "@/api/seatApi";
+import { roomApi } from "@/api/roomApi";
 
-const SEAT_TYPES = ["NORMAL", "VIP", "COUPLE"];
+const SEAT_TYPES = ["STANDARD", "VIP", "COUPLE"];
 const TYPE_STYLE = {
-  NORMAL:  { bg: "bg-surface-container-highest hover:bg-surface-bright", label: "N", color: "text-on-surface" },
-  VIP:     { bg: "bg-yellow-900/60 hover:bg-yellow-800/60",               label: "V", color: "text-yellow-300" },
-  COUPLE:  { bg: "bg-pink-900/60 hover:bg-pink-800/60",                   label: "♥", color: "text-pink-300" },
-  INACTIVE:{ bg: "bg-[#111] border border-dashed border-surface-container-highest", label: "✕", color: "text-surface-container-highest" },
+  STANDARD: { bg: "bg-slate-100 border-slate-300 text-slate-800 hover:bg-slate-200", label: "STD", color: "text-slate-800" },
+  VIP:      { bg: "bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100", label: "VIP", color: "text-amber-700" },
+  COUPLE:   { bg: "bg-pink-50 border-pink-300 text-pink-900 hover:bg-pink-100",   label: "CPL", color: "text-pink-700" },
+  INACTIVE: { bg: "bg-slate-50 border border-dashed border-slate-300 text-slate-300", label: "✕", color: "text-slate-400" },
 };
 
-// Tao luoi ghe trong bo nho tu rows x cols
 const generateGrid = (rowCount, colCount) => {
   const rows = [];
   for (let r = 0; r < rowCount; r++) {
-    const rowLabel = String.fromCharCode(65 + r); // A, B, C...
+    const rowLabel = String.fromCharCode(65 + r);
     for (let c = 1; c <= colCount; c++) {
-      rows.push({ key: `${rowLabel}${c}`, seatRow: rowLabel, seatColumn: c, type: "NORMAL", active: true, id: null });
+      rows.push({ key: `${rowLabel}${c}`, seatRow: rowLabel, seatColumn: c, type: "STANDARD", active: true, id: null });
     }
   }
   return rows;
 };
 
 const AdminSeatPage = () => {
-  const { roomId } = useParams();
+  const [searchParams] = useSearchParams();
+  const roomId = searchParams.get('roomId');
   const navigate = useNavigate();
 
   const [room, setRoom] = useState(null);
-  const [seats, setSeats] = useState([]);  // state lam viec chinh
+  const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
-  // Generate form
   const [genRows, setGenRows] = useState(8);
-  const [genCols, setGenCols] = useState(10);
+  const [genCols, setGenCols] = useState(12);
 
   useEffect(() => {
-    fetchData();
+    if (roomId) fetchData();
   }, [roomId]);
 
   const fetchData = async () => {
@@ -51,217 +51,249 @@ const AdminSeatPage = () => {
       const foundRoom = roomRes.data.find((r) => String(r.id) === String(roomId));
       setRoom(foundRoom || null);
 
-      // Map seats tu API ve format local
       const mapped = seatRes.data.map((s) => ({
         key: `${s.seatRow}${s.seatColumn}`,
         seatRow: s.seatRow,
         seatColumn: s.seatColumn,
-        type: s.type || "NORMAL",
+        type: s.type === "NORMAL" ? "STANDARD" : (s.type || "STANDARD"),
         active: s.isActive !== undefined ? s.isActive : true,
         id: s.id,
-        priceMultiplier: s.priceMultiplier || 1.0,
       }));
       setSeats(mapped);
       setIsDirty(false);
     } catch (err) {
-      console.error(err);
-      alert("Không thể tải dữ liệu phòng");
+      console.error("Lỗi khi tải dữ liệu ghế", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Click ghe: NORMAL -> VIP -> COUPLE -> INACTIVE -> NORMAL
-  const handleSeatClick = (key) => {
+  const handleCycleType = (key) => {
     setSeats((prev) =>
       prev.map((s) => {
         if (s.key !== key) return s;
-        if (!s.active) return { ...s, active: true, type: "NORMAL" };
-        const idx = SEAT_TYPES.indexOf(s.type);
-        const next = idx < SEAT_TYPES.length - 1 ? SEAT_TYPES[idx + 1] : null;
-        if (next) return { ...s, type: next };
-        return { ...s, active: false }; // het vong -> inactive
+        if (!s.active) return { ...s, active: true, type: "STANDARD" };
+        if (s.type === "STANDARD") return { ...s, type: "VIP" };
+        if (s.type === "VIP") return { ...s, type: "COUPLE" };
+        return { ...s, active: false };
       })
     );
     setIsDirty(true);
   };
 
-  // Generate luoi moi (xoa het ghe cu trong state)
-  const handleGenerate = () => {
-    if (seats.length > 0 && !window.confirm("Tạo lại sơ đồ ghế sẽ xoá toàn bộ ghế hiện tại trong bộ nhớ. Tiếp tục?")) return;
-    setSeats(generateGrid(Number(genRows), Number(genCols)));
+  const handleGenerateGrid = () => {
+    if (seats.length > 0 && !window.confirm("Ma trận hiện tại sẽ bị ghi đè. Bạn có chắc muốn tạo lại?")) {
+      return;
+    }
+    const newGrid = generateGrid(Number(genRows), Number(genCols));
+    setSeats(newGrid);
     setIsDirty(true);
   };
 
-  // Luu tat ca len server
   const handleSave = async () => {
-    if (!window.confirm(`Lưu ${seats.length} ghế lên server? Thao tác này sẽ tạo mới toàn bộ (ghế cũ giữ nguyên nếu đã có id).`)) return;
     try {
       setSaving(true);
-      // Chi gui nhung ghe chua co id (ghe moi generate)
-      const newSeats = seats
-        .filter((s) => s.id === null)
+      const payload = seats
+        .filter((s) => s.active)
         .map((s) => ({
           room: { id: Number(roomId) },
           seatRow: s.seatRow,
           seatColumn: s.seatColumn,
           type: s.type,
-          isActive: s.active,
-          priceMultiplier: s.type === "VIP" ? 1.5 : s.type === "COUPLE" ? 2.0 : 1.0,
+          priceMultiplier: s.type === "VIP" ? 1.2 : s.type === "COUPLE" ? 2.0 : 1.0,
+          isActive: true,
         }));
 
-      if (newSeats.length === 0) {
-        alert("Không có ghế mới nào để lưu.");
-        return;
-      }
-
-      await seatApi.createSeats(newSeats);
-      alert(`Đã lưu ${newSeats.length} ghế thành công!`);
-      fetchData(); // reload tu server
+      await seatApi.createSeat(payload);
+      alert("Đã lưu sơ đồ ghế thành công!");
+      setIsDirty(false);
+      fetchData();
     } catch (err) {
-      const msg = err.response?.data?.message || err.message;
-      alert("Lỗi khi lưu: " + msg);
+      console.error(err);
+      const backendError = err.response?.data?.message || err.message;
+      alert(`Lỗi khi lưu: ${backendError}`);
     } finally {
       setSaving(false);
     }
   };
 
-  // Cap nhat type ghe da co id tren server
-  const handleUpdateExisting = async (seat) => {
-    if (!seat.id) return;
-    try {
-      await seatApi.updateSeat(seat.id, {
-        room: { id: Number(roomId) },
-        seatRow: seat.seatRow,
-        seatColumn: seat.seatColumn,
-        type: seat.type,
-        isActive: seat.active,
-        priceMultiplier: seat.type === "VIP" ? 1.5 : seat.type === "COUPLE" ? 2.0 : 1.0,
-      });
-    } catch (err) {
-      alert("Lỗi cập nhật ghế: " + err.message);
-    }
-  };
+  const activeSeatsCount = seats.filter((s) => s.active).length;
+  const vipSeatsCount = seats.filter((s) => s.active && s.type === "VIP").length;
+  const coupleSeatsCount = seats.filter((s) => s.active && s.type === "COUPLE").length;
 
-  // Nhom ghe theo hang de render
   const groupedByRow = seats.reduce((acc, seat) => {
     if (!acc[seat.seatRow]) acc[seat.seatRow] = [];
     acc[seat.seatRow].push(seat);
     return acc;
   }, {});
-  const sortedRows = Object.keys(groupedByRow).sort();
-
-  const activeCount = seats.filter((s) => s.active).length;
-  const newCount = seats.filter((s) => s.id === null).length;
 
   return (
-    <div className="flex flex-col w-full relative min-h-full">
+    <div className="flex flex-col w-full relative min-h-full pb-16 bg-slate-50">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-xl px-xl py-xl pb-md">
-        <div className="flex flex-col gap-sm">
-          <button onClick={() => navigate("/admin/rooms")} className="flex items-center gap-xs text-on-surface-variant hover:text-on-surface transition-colors text-sm w-max">
-            <span className="material-symbols-outlined text-[18px]">arrow_back</span> Quay lại Phòng chiếu
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-8 py-6 bg-white border-b border-slate-200">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/admin/rooms')}
+            className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 cursor-pointer transition-colors"
+          >
+            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 className="font-display-lg text-display-lg text-on-surface">
-            Sơ Đồ Ghế — {room?.name || `Phòng #${roomId}`}
-          </h1>
-          <p className="font-body-lg text-body-lg text-on-surface-variant">
-            {room?.cinema?.name} • {room?.roomType} • <span className="text-primary font-medium">{activeCount} ghế active</span>
-            {newCount > 0 && <span className="text-yellow-400 ml-2">({newCount} ghế mới chưa lưu)</span>}
-          </p>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="material-symbols-outlined text-blue-600">grid_on</span>
+              Sơ Đồ Ghế: {room ? room.name : `Phòng #${roomId}`}
+            </h1>
+            <p className="text-slate-500 text-xs mt-0.5">
+              Cấu hình ma trận ghế ngồi, phân loại Standard, VIP, Couple cho phòng chiếu.
+            </p>
+          </div>
         </div>
-        <div className="flex shrink-0 gap-md">
-          {isDirty && newCount > 0 && (
-            <button onClick={handleSave} disabled={saving}
-              className="flex items-center gap-sm px-lg py-md rounded-xl bg-primary text-on-primary hover:bg-primary-fixed transition-colors font-button text-button shadow-md shadow-primary/20 disabled:opacity-50">
-              <span className="material-symbols-outlined text-[20px]">save</span>
-              {saving ? "Đang lưu..." : `LƯU ${newCount} GHẾ MỚI`}
-            </button>
+
+        <div className="flex items-center gap-3">
+          {isDirty && (
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
+              Có thay đổi chưa lưu
+            </span>
           )}
+          <button
+            onClick={handleSave}
+            disabled={saving || !isDirty}
+            className="flex items-center gap-1.5 px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-xs shadow-sm transition-colors cursor-pointer"
+          >
+            {saving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Đang lưu...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-[18px]">save</span>
+                LƯU SƠ ĐỒ GHẾ
+              </>
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Generate Panel */}
-      <div className="px-xl py-md">
-        <div className="bg-surface-container rounded-2xl p-lg flex flex-col sm:flex-row items-center gap-lg shadow-sm">
-          <span className="material-symbols-outlined text-primary text-[24px]">grid_on</span>
-          <p className="font-label-caps text-label-caps text-on-surface-variant">GENERATE LƯỚI GHẾ MỚI</p>
-          <div className="flex items-center gap-md">
-            <div className="flex flex-col items-center gap-xs">
-              <label className="text-[11px] text-on-surface-variant">Số hàng</label>
-              <input type="number" value={genRows} min={1} max={26} onChange={(e) => setGenRows(e.target.value)}
-                className="w-16 bg-[#1A1A1A] rounded-lg py-sm px-sm text-on-surface font-body-md border border-surface-container-highest focus:border-primary focus:outline-none text-center" />
+      <div className="p-8 space-y-6 max-w-6xl mx-auto">
+        {/* Controls Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Quick Generator */}
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold text-slate-900 mb-0.5">Sinh ma trận tự động</p>
+              <p className="text-[11px] text-slate-500">Nhập số hàng và cột để tạo nhanh</p>
             </div>
-            <span className="text-on-surface-variant mt-4">×</span>
-            <div className="flex flex-col items-center gap-xs">
-              <label className="text-[11px] text-on-surface-variant">Số cột/hàng</label>
-              <input type="number" value={genCols} min={1} max={30} onChange={(e) => setGenCols(e.target.value)}
-                className="w-16 bg-[#1A1A1A] rounded-lg py-sm px-sm text-on-surface font-body-md border border-surface-container-highest focus:border-primary focus:outline-none text-center" />
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min="1"
+                max="20"
+                value={genRows}
+                onChange={(e) => setGenRows(e.target.value)}
+                className="w-14 bg-slate-50 text-slate-900 text-xs font-bold px-2 py-1.5 rounded-lg border border-slate-300 text-center"
+                title="Số hàng"
+              />
+              <span className="text-slate-400 text-xs">×</span>
+              <input
+                type="number"
+                min="1"
+                max="30"
+                value={genCols}
+                onChange={(e) => setGenCols(e.target.value)}
+                className="w-14 bg-slate-50 text-slate-900 text-xs font-bold px-2 py-1.5 rounded-lg border border-slate-300 text-center"
+                title="Số cột"
+              />
+              <button
+                onClick={handleGenerateGrid}
+                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer border border-slate-300"
+              >
+                Tạo lưới
+              </button>
             </div>
-            <button onClick={handleGenerate}
-              className="mt-4 px-lg py-md rounded-xl bg-secondary text-on-secondary hover:bg-secondary-fixed transition-colors font-button text-button">
-              Generate
-            </button>
           </div>
-          <p className="text-[11px] text-on-surface-variant">= {genRows * genCols} ghế • Click ghế để đổi loại</p>
+
+          {/* Stats Bar */}
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-around text-center">
+            <div>
+              <p className="text-[11px] text-slate-500 font-semibold uppercase">Tổng ghế</p>
+              <p className="text-base font-bold text-slate-900">{activeSeatsCount}</p>
+            </div>
+            <div className="h-8 w-px bg-slate-200"></div>
+            <div>
+              <p className="text-[11px] text-amber-700 font-semibold uppercase">Ghế VIP</p>
+              <p className="text-base font-bold text-amber-600">{vipSeatsCount}</p>
+            </div>
+            <div className="h-8 w-px bg-slate-200"></div>
+            <div>
+              <p className="text-[11px] text-pink-700 font-semibold uppercase">Ghế Couple</p>
+              <p className="text-base font-bold text-pink-600">{coupleSeatsCount}</p>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Legend */}
-      <div className="px-xl py-sm flex items-center gap-lg flex-wrap">
-        {Object.entries(TYPE_STYLE).map(([type, style]) => (
-          <div key={type} className="flex items-center gap-xs">
-            <div className={`w-7 h-7 rounded-md flex items-center justify-center text-[11px] font-bold ${style.bg} ${style.color}`}>{style.label}</div>
-            <span className="text-on-surface-variant text-[12px]">{type}</span>
+        {/* Legend */}
+        <div className="flex flex-wrap items-center justify-center gap-4 bg-white px-4 py-3 rounded-xl border border-slate-200 shadow-sm text-xs">
+          <span className="font-semibold text-slate-600">Chú thích (Click vào ghế để đổi loại):</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-5 h-5 rounded bg-slate-100 border border-slate-300 inline-block"></span>
+            <span className="text-slate-700">Thường (100%)</span>
           </div>
-        ))}
-        <p className="text-on-surface-variant text-[12px] ml-auto italic">Click ghế để xoay vòng: NORMAL → VIP → COUPLE → Ẩn → NORMAL</p>
-      </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-5 h-5 rounded bg-amber-50 border border-amber-300 inline-block"></span>
+            <span className="text-amber-800 font-medium">VIP (120%)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-5 h-5 rounded bg-pink-50 border border-pink-300 inline-block"></span>
+            <span className="text-pink-800 font-medium">Couple (200%)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-5 h-5 rounded bg-slate-50 border border-dashed border-slate-300 inline-block"></span>
+            <span className="text-slate-400">Lối đi / Ẩn</span>
+          </div>
+        </div>
 
-      {/* Seat Map — màn hình chiếu */}
-      <div className="px-xl py-lg pb-32 overflow-x-auto">
-        {loading ? (
-          <div className="text-center text-on-surface-variant py-10">Đang tải...</div>
-        ) : seats.length === 0 ? (
-          <div className="text-center text-on-surface-variant py-10">Chưa có ghế. Dùng Generate để tạo lưới ghế.</div>
-        ) : (
-          <div className="flex flex-col items-center gap-sm min-w-max mx-auto">
-            {/* Màn chiếu */}
-            <div className="w-3/4 h-3 rounded-full bg-gradient-to-r from-transparent via-primary/50 to-transparent mb-lg" />
-            <p className="text-on-surface-variant text-[11px] uppercase tracking-widest mb-md">MÀN CHIẾU</p>
+        {/* Seat Matrix Visual Board */}
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center">
+          {/* Cinema Screen simulation */}
+          <div className="w-full max-w-xl mb-10 text-center">
+            <div className="h-2 w-full bg-slate-300 rounded-full shadow-sm"></div>
+            <p className="text-[11px] font-bold tracking-widest text-slate-400 uppercase mt-2">MÀN HÌNH CHIẾU</p>
+          </div>
 
-            {sortedRows.map((rowLabel) => (
-              <div key={rowLabel} className="flex items-center gap-sm">
-                <span className="w-6 text-center text-on-surface-variant text-[12px] font-bold shrink-0">{rowLabel}</span>
-                <div className="flex gap-xs">
-                  {groupedByRow[rowLabel]
-                    .sort((a, b) => a.seatColumn - b.seatColumn)
-                    .map((seat) => {
-                      const typeKey = seat.active ? seat.type : "INACTIVE";
-                      const style = TYPE_STYLE[typeKey];
-                      const isNew = seat.id === null;
+          {/* Grid Layout */}
+          {loading ? (
+            <div className="py-12 text-center text-slate-400 text-xs">Đang tải ma trận ghế...</div>
+          ) : Object.keys(groupedByRow).length === 0 ? (
+            <div className="py-12 text-center text-slate-400 text-xs">
+              Chưa có ghế nào. Hãy nhấn "Tạo lưới" ở phía trên để sinh ma trận ghế.
+            </div>
+          ) : (
+            <div className="space-y-2 overflow-x-auto max-w-full pb-4">
+              {Object.entries(groupedByRow).map(([rowLabel, rowSeats]) => (
+                <div key={rowLabel} className="flex items-center gap-2 justify-center">
+                  <span className="w-6 font-mono font-bold text-slate-500 text-xs text-center">{rowLabel}</span>
+                  <div className="flex gap-1.5">
+                    {rowSeats.map((seat) => {
+                      const style = seat.active ? TYPE_STYLE[seat.type] || TYPE_STYLE.STANDARD : TYPE_STYLE.INACTIVE;
                       return (
                         <button
                           key={seat.key}
-                          onClick={() => {
-                            handleSeatClick(seat.key);
-                            // Neu da co id tren server, tu dong update
-                            if (seat.id) setTimeout(() => handleUpdateExisting(seat), 100);
-                          }}
-                          title={`${seat.key} — ${typeKey}`}
-                          className={`w-8 h-8 rounded-md text-[11px] font-bold transition-all duration-150 relative ${style.bg} ${style.color} ${isNew ? "ring-1 ring-yellow-500/50" : ""}`}
+                          onClick={() => handleCycleType(seat.key)}
+                          className={`w-8 h-8 rounded-lg border text-[11px] font-mono font-bold transition-all cursor-pointer flex items-center justify-center ${style.bg} ${style.color}`}
+                          title={`${seat.seatRow}${seat.seatColumn} (${seat.active ? seat.type : 'Ẩn'})`}
                         >
-                          {style.label}
-                          <span className="absolute bottom-0 right-0 text-[8px] text-on-surface-variant leading-none pr-0.5">{seat.seatColumn}</span>
+                          {seat.active ? seat.seatColumn : '✕'}
                         </button>
                       );
                     })}
+                  </div>
+                  <span className="w-6 font-mono font-bold text-slate-500 text-xs text-center">{rowLabel}</span>
                 </div>
-                <span className="w-6 text-center text-on-surface-variant text-[12px] font-bold shrink-0">{rowLabel}</span>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

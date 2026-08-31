@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
-import { cinemaApi } from '../../api/cinemaApi';
-import { regionApi } from '../../api/regionApi';
+// [AI UPDATE - Chuyen doi AdminCinemaPage sang phong cach Modern Enterprise Office Portal]
+import React, { useState, useEffect } from 'react';
+import { cinemaApi } from '@/api/cinemaApi';
+import { regionApi } from '@/api/regionApi';
 
 const EMPTY_FORM = {
   id: null,
@@ -64,8 +65,8 @@ const AdminCinemaPage = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (name === 'regionId') {
-      const selectedRegion = regions.find((r) => r.id === Number(value));
-      setFormData((prev) => ({ ...prev, region: selectedRegion || null }));
+      const selected = regions.find((r) => String(r.id) === String(value));
+      setFormData((prev) => ({ ...prev, region: selected || null }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -116,243 +117,236 @@ const AdminCinemaPage = () => {
   const activeCinemas = cinemas.filter((c) => c.isActive || c.active).length;
 
   return (
-    <div className="flex flex-col w-full relative min-h-full">
+    <div className="flex flex-col w-full relative min-h-full pb-16 bg-slate-50">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-xl px-xl py-xl pb-md">
-        <div className="flex flex-col gap-sm">
-          <h1 className="font-display-lg text-display-lg text-on-surface">Quản Lý Rạp Chiếu</h1>
-          <p className="font-body-lg text-body-lg text-on-surface-variant max-w-[42rem]">
-            Quản lý danh sách rạp chiếu phim trong hệ thống.
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-8 py-6 bg-white border-b border-slate-200">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <span className="material-symbols-outlined text-blue-600">theater_comedy</span>
+            Quản Lý Rạp Chiếu
+          </h1>
+          <p className="text-slate-500 text-xs mt-0.5">
+            Quản lý danh sách các cụm rạp, địa chỉ và khu vực hoạt động trên toàn quốc.
           </p>
         </div>
-        <div className="flex shrink-0 gap-md">
-          <button
-            className="flex items-center gap-sm px-lg py-md rounded-xl bg-primary text-on-primary hover:bg-primary-fixed transition-colors font-button text-button shadow-md shadow-primary/20"
-            onClick={() => handleOpenModal()}
-          >
-            <span className="material-symbols-outlined text-[20px]">add</span>
-            THÊM RẠP MỚI
-          </button>
-        </div>
+        <button
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm transition-colors cursor-pointer"
+          onClick={() => handleOpenModal()}
+        >
+          <span className="material-symbols-outlined text-[18px]">add</span>
+          THÊM RẠP MỚI
+        </button>
       </div>
 
-      {/* Stats */}
-      <div className="px-xl py-md">
-        <div className="bg-surface-container rounded-2xl p-lg shadow-md flex justify-around w-full max-w-2xl">
-          <div className="text-center">
-            <p className="text-display-md text-primary font-bold">{cinemas.length}</p>
-            <p className="text-on-surface-variant text-sm uppercase tracking-wider">Tổng rạp</p>
+      <div className="p-8 space-y-6">
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl">
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+              <span className="material-symbols-outlined text-[20px]">domain</span>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-semibold uppercase">Tổng số rạp</p>
+              <p className="text-xl font-bold text-slate-900">{cinemas.length}</p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-display-md text-green-500 font-bold">{activeCinemas}</p>
-            <p className="text-on-surface-variant text-sm uppercase tracking-wider">Đang Active</p>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+              <span className="material-symbols-outlined text-[20px]">check_circle</span>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-semibold uppercase">Đang hoạt động</p>
+              <p className="text-xl font-bold text-emerald-600">{activeCinemas}</p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-display-md text-red-500 font-bold">{cinemas.length - activeCinemas}</p>
-            <p className="text-on-surface-variant text-sm uppercase tracking-wider">Đã ẩn</p>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center border border-slate-200">
+              <span className="material-symbols-outlined text-[20px]">pause_circle</span>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-semibold uppercase">Tạm dừng</p>
+              <p className="text-xl font-bold text-slate-600">{cinemas.length - activeCinemas}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* List */}
-      <div className="px-xl py-lg flex flex-col gap-gutter pb-32">
-        {loading ? (
-          <div className="text-center text-on-surface-variant py-10">Đang tải dữ liệu...</div>
-        ) : (
-          <div className="flex flex-col gap-md">
-            {cinemas.map((cinema) => (
-              <div
-                key={cinema.id}
-                className={`group bg-surface-container hover:bg-surface-container-high rounded-2xl p-md shadow-sm transition-all duration-300 flex flex-col md:flex-row gap-md items-center ${!(cinema.isActive ?? cinema.active) ? 'opacity-50 grayscale' : ''}`}
-              >
-                {/* Icon + Info */}
-                <div className="flex items-center gap-lg w-full md:w-1/2">
-                  <div className="w-14 h-14 shrink-0 rounded-xl bg-surface-container-highest flex items-center justify-center shadow-md">
-                    <span className="material-symbols-outlined text-primary text-[28px]">theater_comedy</span>
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <h3 className="font-headline-md text-headline-md text-on-surface truncate">{cinema.name}</h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant truncate">
-                      {cinema.address || 'Chưa có địa chỉ'}
-                    </p>
-                    <div className="flex items-center gap-xs mt-xs flex-wrap">
-                      {cinema.region && (
-                        <span className="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-caps text-[10px]">
-                          {cinema.region.name}
+        {/* Table List */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900">Danh Sách Cụm Rạp</h2>
+            <span className="text-xs text-slate-500 font-medium">Tổng: {cinemas.length} cụm rạp</span>
+          </div>
+
+          {loading ? (
+            <div className="py-16 text-center text-slate-500 text-xs">Đang tải danh sách rạp...</div>
+          ) : cinemas.length === 0 ? (
+            <div className="py-12 text-center text-slate-500 text-xs">Chưa có rạp nào trong hệ thống.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-600 uppercase font-semibold border-b border-slate-200">
+                  <tr>
+                    <th className="p-3.5">ID</th>
+                    <th className="p-3.5">Tên Cụm Rạp</th>
+                    <th className="p-3.5">Địa Chỉ</th>
+                    <th className="p-3.5">Khu Vực</th>
+                    <th className="p-3.5">Hotline</th>
+                    <th className="p-3.5">Trạng Thái</th>
+                    <th className="p-3.5 text-right">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {cinemas.map((cinema) => (
+                    <tr key={cinema.id} className="hover:bg-blue-50/30 transition-colors">
+                      <td className="p-3.5 font-mono text-slate-500">#{cinema.id}</td>
+                      <td className="p-3.5 font-bold text-slate-900">{cinema.name}</td>
+                      <td className="p-3.5 text-slate-600 max-w-xs truncate">{cinema.address || 'Chưa cập nhật'}</td>
+                      <td className="p-3.5">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 font-medium text-[11px]">
+                          {cinema.region?.name || 'Toàn quốc'}
                         </span>
-                      )}
-                      {cinema.phoneNumber && (
-                        <span className="text-on-surface-variant text-[12px]">{cinema.phoneNumber}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Status */}
-                <div className="w-full md:w-1/4 flex flex-col justify-center">
-                  {cinema.isActive || cinema.active ? (
-                    <span className="inline-flex items-center gap-xs px-sm py-xs rounded-full bg-green-900/40 text-green-400 font-label-caps text-label-caps w-max">
-                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                      ĐANG HOẠT ĐỘNG
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-xs px-sm py-xs rounded-full bg-red-900/40 text-red-400 font-label-caps text-label-caps w-max">
-                      ĐÃ BỊ ẨN
-                    </span>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="w-full md:w-1/4 flex justify-end gap-sm">
-                  <button
-                    onClick={() => handleOpenModal(cinema)}
-                    className="px-4 py-2 rounded-xl bg-surface-container-highest hover:bg-surface-bright text-on-surface transition-colors flex items-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">edit</span> Sửa
-                  </button>
-                  {(cinema.isActive || cinema.active) && (
-                    <button
-                      onClick={() => handleDelete(cinema.id)}
-                      className="px-4 py-2 rounded-xl bg-red-900/40 hover:bg-red-900/60 text-red-200 transition-colors flex items-center gap-2"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">delete</span> Ẩn
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-            {cinemas.length === 0 && (
-              <div className="text-center text-on-surface-variant py-10">Chưa có rạp chiếu nào.</div>
-            )}
-          </div>
-        )}
+                      </td>
+                      <td className="p-3.5 font-mono text-slate-600">{cinema.phoneNumber || 'N/A'}</td>
+                      <td className="p-3.5">
+                        {cinema.isActive || cinema.active ? (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            Hoạt động
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                            Tạm ẩn
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3.5 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleOpenModal(cinema)}
+                            className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer transition-colors"
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            onClick={() => handleDelete(cinema.id)}
+                            className="px-2.5 py-1 rounded bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold cursor-pointer transition-colors"
+                          >
+                            Ẩn
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Modal Thêm/Sửa */}
+      {/* Modal Thêm/Sửa Rạp */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-md">
-          <div
-            className="absolute inset-0 bg-background/80 backdrop-blur-xl"
-            onClick={() => setIsModalOpen(false)}
-          ></div>
-
-          <form
-            onSubmit={handleSubmit}
-            className="relative bg-surface rounded-2xl shadow-2xl w-full max-w-[40rem] max-h-[90vh] overflow-y-auto flex flex-col border border-surface-container-highest"
-          >
-            {/* Modal Header */}
-            <div className="h-24 bg-surface-container relative flex items-center px-xl border-b border-surface-container-highest">
-              <h2 className="font-display-sm text-display-sm text-on-surface">
-                {formData.id ? 'Sửa Thông Tin Rạp' : 'Thêm Rạp Mới'}
-              </h2>
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in fade-in zoom-in duration-150">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="font-bold text-slate-900 text-base">
+                {formData.id ? 'Cập Nhật Cụm Rạp' : 'Thêm Cụm Rạp Mới'}
+              </h3>
               <button
-                type="button"
-                className="absolute top-1/2 right-md -translate-y-1/2 w-10 h-10 rounded-full hover:bg-surface transition-colors flex items-center justify-center text-on-surface"
                 onClick={() => setIsModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div className="p-xl flex flex-col gap-lg">
-              {/* Tên rạp */}
-              <div className="flex flex-col gap-xs">
-                <label className="font-label-caps text-label-caps text-on-surface-variant">Tên rạp *</label>
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Tên rạp chiếu *</label>
                 <input
+                  type="text"
                   name="name"
+                  required
                   value={formData.name}
                   onChange={handleChange}
-                  required
-                  className="w-full bg-[#1A1A1A] rounded-xl py-md px-md text-on-surface font-body-md border border-surface-container-highest focus:border-primary focus:outline-none transition-colors"
-                  placeholder="VD: CGV Vincom Center"
-                  type="text"
+                  placeholder="VD: CGV Landmark 81"
+                  className="w-full bg-slate-50 text-slate-900 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500"
                 />
               </div>
 
-              {/* Địa chỉ */}
-              <div className="flex flex-col gap-xs">
-                <label className="font-label-caps text-label-caps text-on-surface-variant">Địa chỉ *</label>
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Địa chỉ rạp *</label>
                 <input
+                  type="text"
                   name="address"
+                  required
                   value={formData.address}
                   onChange={handleChange}
-                  required
-                  className="w-full bg-[#1A1A1A] rounded-xl py-md px-md text-on-surface font-body-md border border-surface-container-highest focus:border-primary focus:outline-none transition-colors"
-                  placeholder="VD: 72 Lê Thánh Tôn, Q1, TP.HCM"
-                  type="text"
+                  placeholder="VD: Tầng B1 Vincom Landmark 81"
+                  className="w-full bg-slate-50 text-slate-900 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-                {/* SĐT */}
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-caps text-label-caps text-on-surface-variant">Số điện thoại</label>
-                  <input
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    className="w-full bg-[#1A1A1A] rounded-xl py-md px-md text-on-surface font-body-md border border-surface-container-highest focus:border-primary focus:outline-none transition-colors"
-                    placeholder="VD: 028 3825 5233"
-                    type="text"
-                  />
-                </div>
-
-                {/* Khu vực */}
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-caps text-label-caps text-on-surface-variant">Khu vực *</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Khu vực</label>
                   <select
                     name="regionId"
                     value={formData.region?.id || ''}
                     onChange={handleChange}
-                    required
-                    className="w-full bg-[#1A1A1A] rounded-xl py-md px-md text-on-surface font-body-md border border-surface-container-highest focus:border-primary focus:outline-none transition-colors appearance-none"
+                    className="w-full bg-slate-50 text-slate-900 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
                   >
-                    <option value="">-- Chọn khu vực --</option>
-                    {regions.map((region) => (
-                      <option key={region.id} value={region.id}>
-                        {region.name}
+                    <option value="">Chọn khu vực</option>
+                    {regions.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.name}
                       </option>
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Hotline</label>
+                  <input
+                    type="text"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    placeholder="VD: 1900 6017"
+                    className="w-full bg-slate-50 text-slate-900 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
               </div>
 
-              {/* Active (chỉ khi edit) */}
-              {formData.id && (
-                <div className="flex items-center gap-md">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    id="isActive"
-                    checked={formData.isActive}
-                    onChange={handleChange}
-                    className="w-5 h-5"
-                  />
-                  <label htmlFor="isActive" className="font-body-md text-on-surface cursor-pointer">
-                    Đang hoạt động (Active)
-                  </label>
-                </div>
-              )}
-            </div>
+              <div className="flex items-center gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={formData.isActive}
+                  onChange={handleChange}
+                  className="accent-blue-600 cursor-pointer"
+                />
+                <label htmlFor="isActive" className="text-slate-700 font-medium cursor-pointer">
+                  Kích hoạt hoạt động rạp
+                </label>
+              </div>
 
-            {/* Modal Footer */}
-            <div className="p-xl bg-surface-container-lowest border-t border-surface-container-highest flex justify-end gap-md">
-              <button
-                type="button"
-                className="px-lg py-md rounded-xl text-on-surface hover:bg-surface-container transition-colors font-button text-button"
-                onClick={() => setIsModalOpen(false)}
-              >
-                HỦY
-              </button>
-              <button
-                type="submit"
-                className="px-xl py-md rounded-xl bg-primary text-on-primary hover:bg-primary-fixed transition-colors font-button text-button shadow-md shadow-primary/20"
-              >
-                LƯU RẠP
-              </button>
-            </div>
-          </form>
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold cursor-pointer"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm cursor-pointer"
+                >
+                  {formData.id ? 'Lưu Thay Đổi' : 'Thêm Mới'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

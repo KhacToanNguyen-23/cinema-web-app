@@ -1,14 +1,16 @@
 package com.cinema.controller;
 
 import com.cinema.dto.ShowtimeDto;
-import com.cinema.mapper.ShowtimeMapper;
 import com.cinema.entity.Showtime;
-import com.cinema.service.ShowtimeService;
+import com.cinema.mapper.ShowtimeMapper;
 import com.cinema.repository.MovieRepository;
 import com.cinema.repository.RoomRepository;
+import com.cinema.service.ShowtimeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,7 @@ public class ShowtimeController {
     private final MovieRepository movieRepository;
     private final RoomRepository roomRepository;
 
-    // [AI UPDATE - Thêm RequestParam cinemaId để lọc dữ liệu cho Manager]
+    // [AI UPDATE - Them RequestParam cinemaId de loc du lieu cho Manager]
     @GetMapping
     public ResponseEntity<List<ShowtimeDto>> getAllShowtimes(@RequestParam(required = false) Long cinemaId) {
         List<Showtime> showtimes;
@@ -34,16 +36,21 @@ public class ShowtimeController {
         return ResponseEntity.ok(showtimes.stream().map(showtimeMapper::toDto).collect(Collectors.toList()));
     }
 
+    // [AI UPDATE - Bo sung endpoint lay chi tiet mot suat chieu theo ID]
+    @GetMapping("/{id}")
+    public ResponseEntity<ShowtimeDto> getShowtimeById(@PathVariable Long id) {
+        Showtime showtime = showtimeService.getShowtimeById(id);
+        if (showtime == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(showtimeMapper.toDto(showtime));
+    }
+
+    // [AI UPDATE - Gop chung POST /api/v1/showtimes nhan List<ShowtimeDto> cho ca tao don le lan hang loat]
     @PostMapping
-    public ResponseEntity<ShowtimeDto> createShowtime(@RequestBody ShowtimeDto dto) {
-        Showtime entity = new Showtime();
-        entity.setStartTime(dto.getStartTime());
-        entity.setEndTime(dto.getEndTime());
-        entity.setPrice(dto.getPrice());
-        entity.setMovie(movieRepository.findById(dto.getMovieId()).orElseThrow());
-        entity.setRoom(roomRepository.findById(dto.getRoomId()).orElseThrow());
-        
-        return ResponseEntity.ok(showtimeMapper.toDto(showtimeService.createShowtime(entity)));
+    public ResponseEntity<List<ShowtimeDto>> createShowtimes(@RequestBody List<ShowtimeDto> dtos) {
+        List<ShowtimeDto> created = showtimeService.createShowtimes(dtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
@@ -52,6 +59,7 @@ public class ShowtimeController {
         entity.setStartTime(dto.getStartTime());
         entity.setEndTime(dto.getEndTime());
         entity.setPrice(dto.getPrice());
+        if (dto.getFormat() != null) entity.setFormat(dto.getFormat());
         if (dto.getMovieId() != null) entity.setMovie(movieRepository.findById(dto.getMovieId()).orElseThrow());
         if (dto.getRoomId() != null) entity.setRoom(roomRepository.findById(dto.getRoomId()).orElseThrow());
         

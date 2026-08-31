@@ -101,7 +101,9 @@ public class DataInitializer implements CommandLineRunner {
         // 3. Tạo Room
         com.cinema.entity.Room room = new com.cinema.entity.Room();
         room.setCinema(cinema);
-        room.setRoomType("IMAX");
+        room.setName("Phòng IMAX 01");
+        // [AI UPDATE - Chuyen doi setRoomType sang enum RoomType.IMAX]
+        room.setRoomType(com.cinema.entity.RoomType.IMAX);
         room.setCapacity(50);
         room.setActive(true);
         room = roomRepository.save(room);

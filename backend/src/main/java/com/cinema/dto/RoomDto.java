@@ -8,6 +8,7 @@ public class RoomDto {
     private String name;
     private CinemaDto cinema;
     private int capacity;
-    private String roomType;
+    // [AI UPDATE - Chuyen doi roomType sang kieu Enum RoomType type-safe]
+    private com.cinema.entity.RoomType roomType;
     private boolean isActive;
 }
