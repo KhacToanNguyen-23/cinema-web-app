@@ -1,28 +1,27 @@
-# Kế hoạch triển khai (Implementation Plan)
+# Implementation Plan: Convert Project README.md to English & Omit Sensitive Documentation Section
 
-## Mục tiêu hiện tại
-Nâng cấp tính năng Thêm Lịch Chiếu từ "Tạo đơn lẻ" (Single Create) thành "Tạo hàng loạt" (Bulk Create) để tối ưu UX cho Manager. Rạp trưởng không cần phải mỏi tay nhập 20 lần cho 20 suất chiếu trong một ngày nữa.
+Translate the existing `README.md` SRS document completely into English, maintaining full technical accuracy, Mermaid diagrams, and professional formatting, while omitting Section 7 (Reference Documents / sensitive file references) as instructed by the user.
 
 ## User Review Required
-> [!TIP]
-> **Quy trình mới (Chuẩn thực tế):**
-> 1. Manager chọn Phim, Phòng chiếu, Giá vé và **Ngày chiếu** (VD: 27/08/2026).
-> 2. Manager chỉ cần bấm thêm các **Giờ bắt đầu** (VD: 08:00, 10:30, 14:00, 19:00).
-> 3. Hệ thống sẽ **tự động tính Giờ kết thúc (End Time)** dựa vào thời lượng phim (Duration) của bộ phim đó.
-> 4. Bấm Lưu 1 phát -> Frontend sẽ tự động sinh ra 20 suất chiếu và đẩy lên Backend.
+
+> [!IMPORTANT]
+> - **Language:** The entire `README.md` will be rewritten in professional English (Enterprise SRS / BRD standard).
+> - **Omission:** Section 7 (Reference Documents / Sensitive Files Documentation) will be completely removed to ensure no reference to internal docs or sensitive configurations exists in the README.
 
 ## Proposed Changes
 
-### [MODIFY] `frontend/src/pages/admin/AdminShowtimePage.jsx`
-- Sửa đổi cấu trúc `formData` trong form Thêm/Sửa. Bỏ `startTime` và `endTime` cũ, thay bằng:
-  - `showDate`: Ngày chiếu (YYYY-MM-DD).
-  - `timeSlots`: Mảng các giờ chiếu (Ví dụ: `['08:00', '10:00']`).
-- Giao diện Form sẽ cho phép "Thêm khung giờ" bằng một nút bấm (+).
-- Trong hàm `handleSubmit`:
-  - Tìm `movie` đang được chọn để lấy `duration` (thời lượng).
-  - Dùng vòng lặp tạo ra một mảng các payload. Mỗi payload sẽ cộng `showDate` + `time` ra `startTime`, và cộng thêm `duration` ra `endTime`.
-  - Dùng `Promise.all` để gọi API `createShowtime` nhiều lần cùng lúc.
+### Documentation
+
+#### [MODIFY] [README.md](file:///d:/Project/Personal/cinema-web-app/README.md)
+- Translate all headers, tables, requirement IDs descriptions, NFR specifications, state machine descriptions, RBAC matrices, and Mermaid diagram labels into professional English.
+- Remove Section 7 ("Tài Liệu Kỹ Thuật Tham Chiếu / Reference Documents") and any references to sensitive configuration/internal documentation files.
+
+#### [MODIFY] [task.md](file:///d:/Project/Personal/cinema-web-app/task.md)
+- Track progress of translating `README.md` and updating task states.
 
 ## Verification Plan
-- Chờ người dùng duyệt (Proceed).
-- Code xong sẽ yêu cầu người dùng F5, thử chọn 1 phim, chọn 1 ngày và nhập 3 khung giờ khác nhau rồi bấm Lưu xem có ra 3 dòng lịch chiếu không.
+
+### Manual Verification
+1. Inspect `README.md` to verify all content is in English.
+2. Verify that Mermaid diagrams render properly with updated English labels.
+3. Confirm that Section 7 / sensitive file references are absent from `README.md`.

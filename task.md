@@ -1,5 +1,6 @@
-# Nhiệm vụ: Viết Lại README.md Theo Định Dạng Bản Yêu Cầu (Requirements Document - SRS)
+# Tasks: Translate README.md to English & Omit Sensitive Docs Section
 
-- [x] Lập Implementation Plan và chờ phê duyệt <!-- id: 0 -->
-- [x] Soạn thảo toàn bộ `README.md` thuần túy theo Bản Đặc Tả Yêu Cầu (SRS) - Không chứa config/password <!-- id: 1 -->
-- [x] Commit và push lên GitHub <!-- id: 2 -->
+- [x] Create Implementation Plan & wait for user approval ("Proceed") <!-- id: 0 -->
+- [x] Translate `README.md` to English SRS format <!-- id: 1 -->
+- [x] Remove Section 7 (Reference Documents & sensitive file references) from `README.md` <!-- id: 2 -->
+- [x] Verify formatting, Mermaid diagrams, and language accuracy <!-- id: 3 -->

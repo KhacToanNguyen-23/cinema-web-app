@@ -2,6 +2,10 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [02-09-2026 22:54] - Translate README.md to English & Omit Sensitive Documents Section
+### Changed (Thay đổi)
+- `README.md`: Chuyển đổi toàn bộ nội dung tài liệu SRS sang tiếng Anh chuẩn Enterprise (Functional Requirements, Non-Functional Requirements, Seat State Machine, RBAC Matrix, Technology Stack Architecture) và loại bỏ hoàn toàn Mục 7 (Tài liệu tham chiếu / tệp nhạy cảm).
+
 ## [31-08-2026 12:38] - Tái Cấu Trúc README.md Thành Bản Đặc Tả Yêu Cầu Hệ Thống & Nghiệp Vụ (SRS)
 ### Changed (Thay đổi)
 - `README.md`: Chuyển đổi toàn bộ nội dung sang cấu trúc Bản Đặc Tả Yêu Cầu Phần Mềm (Software Requirements Specification - SRS): Danh mục Yêu cầu Chức năng (`REQ-FR-xx`), Yêu cầu Phi Chức năng (`REQ-NFR-xx`), Chu trình sống của ghế (Seat State Machine), Ma trận phân quyền RBAC và Ngăn xếp kiến trúc hệ thống, đồng thời bảo mật tuyệt đối không in thông tin cấu hình nhạy cảm.
