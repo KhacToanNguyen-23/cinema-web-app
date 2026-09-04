@@ -12,6 +12,8 @@ import AdminCinemaPage from '../pages/admin/AdminCinemaPage';
 import AdminRoomPage from '../pages/admin/AdminRoomPage';
 import AdminSeatPage from '../pages/admin/AdminSeatPage';
 import StaffPOSPage from '../pages/staff/StaffPOSPage';
+import StaffTicketsPage from '../pages/staff/StaffTicketsPage';
+import StaffFoodPage from '../pages/staff/StaffFoodPage';
 import LoginPage from '../pages/auth/LoginPage';
 import UserManagementPage from '../pages/admin/UserManagementPage';
 import ProtectedRoute from './ProtectedRoute';
@@ -49,6 +51,9 @@ const AppRoutes = () => {
       <Route path="/staff" element={<ProtectedRoute />}>
         <Route element={<StaffLayout><Outlet /></StaffLayout>}>
           <Route path="pos" element={<StaffPOSPage />} />
+          {/* [AI UPDATE - Đăng ký route Quản lý vé & Quầy Bắp Nước cho Staff POS Box Office] */}
+          <Route path="tickets" element={<StaffTicketsPage />} />
+          <Route path="food" element={<StaffFoodPage />} />
         </Route>
       </Route>
 

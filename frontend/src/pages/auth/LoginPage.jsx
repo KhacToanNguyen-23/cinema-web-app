@@ -1,12 +1,13 @@
-﻿import { useState } from 'react';
+// [AI UPDATE - Chuẩn hóa giao diện LoginPage thống nhất 100% theo LoginModal (Ảnh 2)]
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const DEMO_ACCOUNTS = [
-  { label: 'Admin', username: 'admin', password: '123456', color: 'bg-red-600 hover:bg-red-700' },
-  { label: 'Manager', username: 'manager', password: '123456', color: 'bg-purple-600 hover:bg-purple-700' },
-  { label: 'Staff', username: 'staff', password: '123456', color: 'bg-blue-600 hover:bg-blue-700' },
-  { label: 'Customer', username: 'customer', password: '123456', color: 'bg-green-600 hover:bg-green-700' },
+  { label: 'Admin', username: 'admin', password: '123456', icon: 'admin_panel_settings' },
+  { label: 'Manager', username: 'manager', password: '123456', icon: 'manage_accounts' },
+  { label: 'Staff', username: 'staff', password: '123456', icon: 'badge' },
+  { label: 'Customer', username: 'customer', password: '123456', icon: 'person' },
 ];
 
 const LoginPage = () => {
@@ -28,10 +29,10 @@ const LoginPage = () => {
     const decoded = parseJwt(token);
     if (decoded && decoded.role === 'STAFF') {
       navigate('/staff/pos');
-    } else if (decoded && decoded.role === 'MEMBER') {
-      navigate('/');
-    } else {
+    } else if (decoded && (decoded.role === 'ADMIN' || decoded.role === 'MANAGER')) {
       navigate('/admin/dashboard');
+    } else {
+      navigate('/');
     }
   };
 
@@ -42,94 +43,101 @@ const LoginPage = () => {
     if (success) {
       redirectByRole(localStorage.getItem('token'));
     } else {
-      setError('Tai khoan hoac mat khau khong chinh xac.');
+      setError('Tài khoản hoặc mật khẩu không chính xác.');
     }
   };
 
-  const handleQuickLogin = async (acc) => {
+  const fillDemo = (acc) => {
+    setUsername(acc.username);
+    setPassword(acc.password);
     setError('');
-    const success = await login(acc.username, acc.password);
-    if (success) {
-      redirectByRole(localStorage.getItem('token'));
-    } else {
-      setError('Dang nhap nhanh that bai.');
-    }
   };
 
   return (
     <div
-      className="min-h-screen bg-background flex flex-col items-center justify-center font-body-md text-on-background relative overflow-hidden p-xl"
+      className="min-h-screen bg-background flex flex-col items-center justify-center font-body-md text-on-background relative overflow-hidden p-md"
       style={{
         backgroundImage: "url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070&auto=format&fit=crop')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40 z-0"></div>
+      {/* Background Overlay */}
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-0"></div>
 
-      <div className="relative z-10 w-full max-w-[28rem] bg-surface-container-low/80 backdrop-blur-2xl p-xl rounded-2xl border border-outline-variant/40 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-        <div className="flex flex-col items-center mb-xl gap-sm">
-          <h1 className="font-headline-md text-headline-md text-primary tracking-tight">CINEMAX</h1>
-          <p className="text-on-surface-variant font-body-md text-center">Dang nhap vao he thong quan ly rap chieu</p>
+      {/* Card matching Image 2 / LoginModal */}
+      <div className="relative z-10 w-full max-w-[28rem] bg-surface-container-high p-xl rounded-3xl border border-outline-variant/40 shadow-2xl animate-fade-in-up">
+        <div className="flex flex-col items-center mb-xl gap-sm mt-sm">
+          <h2 className="font-display-sm text-display-sm text-on-surface tracking-tight">Đăng nhập</h2>
+          <p className="text-on-surface-variant font-body-md text-center">Chào mừng bạn trở lại với CineMax</p>
+        </div>
+
+        {/* Demo accounts quick fill */}
+        <div className="mb-md">
+          <p className="text-[11px] uppercase text-on-surface-variant tracking-widest mb-sm text-center">Tài khoản demo</p>
+          <div className="grid grid-cols-4 gap-xs">
+            {DEMO_ACCOUNTS.map((acc) => (
+              <button
+                key={acc.username}
+                type="button"
+                onClick={() => fillDemo(acc)}
+                title={`${acc.username} / ${acc.password}`}
+                className="flex flex-col items-center gap-[3px] py-sm px-xs rounded-xl bg-surface-container hover:bg-primary/10 hover:text-primary border border-outline-variant/40 hover:border-primary/40 transition-all text-on-surface-variant group cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[20px] group-hover:text-primary">{acc.icon}</span>
+                <span className="text-[11px] font-medium">{acc.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-sm mb-md">
+          <div className="flex-1 h-px bg-outline-variant/50"></div>
+          <span className="text-[11px] uppercase text-on-surface-variant tracking-widest">hoặc nhập thủ công</span>
+          <div className="flex-1 h-px bg-outline-variant/50"></div>
         </div>
 
         {error && (
-          <div className="mb-md p-sm bg-error-container text-on-error-container rounded-lg text-center text-sm border border-error/50">
+          <div className="mb-md p-sm bg-error-container text-on-error-container rounded-xl text-center text-sm border border-error/50">
             {error}
           </div>
         )}
 
         <form onSubmit={handleLogin} className="flex flex-col gap-md">
           <div className="flex flex-col gap-xs">
-            <label className="font-label-caps text-[12px] uppercase text-on-surface-variant">Ten dang nhap</label>
+            <label className="font-label-caps text-[12px] uppercase text-on-surface-variant">Tên đăng nhập</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="px-md py-sm rounded-lg bg-surface text-on-surface border border-outline-variant focus:border-primary focus:outline-none transition-colors"
-              placeholder="Nhap ten dang nhap"
+              className="px-md py-sm rounded-xl bg-surface text-on-surface border border-outline-variant focus:border-primary focus:outline-none transition-colors"
+              placeholder="Nhập tên đăng nhập"
               required
             />
           </div>
 
           <div className="flex flex-col gap-xs">
-            <label className="font-label-caps text-[12px] uppercase text-on-surface-variant">Mat khau</label>
+            <label className="font-label-caps text-[12px] uppercase text-on-surface-variant">Mật khẩu</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="px-md py-sm rounded-lg bg-surface text-on-surface border border-outline-variant focus:border-primary focus:outline-none transition-colors"
-              placeholder="..."
+              className="px-md py-sm rounded-xl bg-surface text-on-surface border border-outline-variant focus:border-primary focus:outline-none transition-colors"
+              placeholder="••••••••"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="mt-sm w-full py-md bg-primary text-white font-button rounded-xl hover:bg-primary-container hover:text-on-primary-container transition-all shadow-[0_4px_12px_rgba(229,9,20,0.3)]"
+            className="mt-sm w-full py-md bg-primary text-white font-button rounded-xl hover:bg-primary-container hover:text-on-primary-container transition-all shadow-md flex justify-center items-center gap-2 cursor-pointer"
           >
-            DANG NHAP
+            ĐĂNG NHẬP
           </button>
         </form>
 
-        <div className="mt-lg">
-          <div className="flex items-center gap-sm mb-md">
-            <div className="flex-1 h-px bg-outline-variant/50"></div>
-            <span className="text-[11px] uppercase text-on-surface-variant tracking-widest">TAI KHOAN DEMO</span>
-            <div className="flex-1 h-px bg-outline-variant/50"></div>
-          </div>
-          <div className="grid grid-cols-2 gap-sm">
-            {DEMO_ACCOUNTS.map((acc) => (
-              <button
-                key={acc.username}
-                onClick={() => handleQuickLogin(acc)}
-                className={`${acc.color} text-white text-sm font-medium py-sm px-md rounded-lg transition-colors flex flex-col items-center gap-[2px]`}
-              >
-                <span className="font-bold">{acc.label}</span>
-                <span className="text-white/70 text-[11px]">{acc.username} / {acc.password}</span>
-              </button>
-            ))}
-          </div>
+        <div className="mt-lg text-center text-on-surface-variant font-body-sm">
+          Chưa có tài khoản? <a href="#" className="text-primary hover:underline">Đăng ký ngay</a>
         </div>
       </div>
     </div>

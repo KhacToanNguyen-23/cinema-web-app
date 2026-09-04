@@ -1,27 +1,16 @@
-# Implementation Plan: Convert Project README.md to English & Omit Sensitive Documentation Section
+# Implementation Plan: Standardize Login UI & Staff Portal Enterprise Light Theme
 
-Translate the existing `README.md` SRS document completely into English, maintaining full technical accuracy, Mermaid diagrams, and professional formatting, while omitting Section 7 (Reference Documents / sensitive file references) as instructed by the user.
+## Overview
+1. Standardize `LoginPage.jsx` to match Image 2 (`LoginModal.jsx`) style.
+2. Fix route redirection bugs for Staff Sidebar navigation by registering `/staff/tickets` and `/staff/food` in `AppRoutes.jsx`.
+3. Create UI-only pages for `StaffTicketsPage.jsx` and `StaffFoodPage.jsx` with zero mock data and clean empty states.
+4. Synchronize all Staff portal pages (`StaffPOSPage.jsx`, `StaffTicketsPage.jsx`, `StaffFoodPage.jsx`) to the modern Enterprise Light SaaS Theme (`bg-slate-50`, `bg-white`, `text-slate-900`, `text-blue-600`).
 
-## User Review Required
+## Changes Made
 
-> [!IMPORTANT]
-> - **Language:** The entire `README.md` will be rewritten in professional English (Enterprise SRS / BRD standard).
-> - **Omission:** Section 7 (Reference Documents / Sensitive Files Documentation) will be completely removed to ensure no reference to internal docs or sensitive configurations exists in the README.
-
-## Proposed Changes
-
-### Documentation
-
-#### [MODIFY] [README.md](file:///d:/Project/Personal/cinema-web-app/README.md)
-- Translate all headers, tables, requirement IDs descriptions, NFR specifications, state machine descriptions, RBAC matrices, and Mermaid diagram labels into professional English.
-- Remove Section 7 ("Tài Liệu Kỹ Thuật Tham Chiếu / Reference Documents") and any references to sensitive configuration/internal documentation files.
-
-#### [MODIFY] [task.md](file:///d:/Project/Personal/cinema-web-app/task.md)
-- Track progress of translating `README.md` and updating task states.
-
-## Verification Plan
-
-### Manual Verification
-1. Inspect `README.md` to verify all content is in English.
-2. Verify that Mermaid diagrams render properly with updated English labels.
-3. Confirm that Section 7 / sensitive file references are absent from `README.md`.
+### Frontend
+- `LoginPage.jsx`: Redesigned card, demo account pills with icons, manual input divider, and role-based redirects.
+- `AppRoutes.jsx`: Registered `/staff/tickets` and `/staff/food`.
+- `StaffTicketsPage.jsx`: Created UI for ticket lookup, QR validation status, and details panel in Enterprise Light Theme.
+- `StaffFoodPage.jsx`: Created UI for concession counter with category filtering, cart, and bill summary in Enterprise Light Theme.
+- `StaffPOSPage.jsx`: Migrated entire POS layout, seat layout, snack grid, and ticket print modal to Enterprise Light Theme.

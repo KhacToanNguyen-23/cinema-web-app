@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
+// [AI UPDATE - Dong bo hoa StaffPOSPage sang Enterprise Light Theme chuan SaaS Office Portal]
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { showtimeApi } from '../../api/showtimeApi';
 import { movieApi } from '../../api/movieApi';
@@ -14,9 +15,9 @@ const SNACKS = [
 ];
 
 const TYPE_COLOR = {
-  NORMAL: { bg: 'bg-surface-container-highest hover:bg-surface-bright', label: 'N', text: 'text-on-surface' },
-  VIP: { bg: 'bg-yellow-900/60 hover:bg-yellow-800/60', label: 'V', text: 'text-yellow-300' },
-  COUPLE: { bg: 'bg-pink-900/60 hover:bg-pink-800/60', label: 'C', text: 'text-pink-300' },
+  NORMAL: { bg: 'bg-slate-100 hover:bg-slate-200 border border-slate-300', label: 'N', text: 'text-slate-700' },
+  VIP: { bg: 'bg-amber-50 hover:bg-amber-100 border border-amber-300', label: 'V', text: 'text-amber-700' },
+  COUPLE: { bg: 'bg-pink-50 hover:bg-pink-100 border border-pink-300', label: 'C', text: 'text-pink-700' },
 };
 
 const StaffPOSPage = () => {
@@ -114,7 +115,7 @@ const StaffPOSPage = () => {
           id: `seat-${seat.seatId}`,
           type: 'TICKET',
           seatId: seat.seatId,
-          name: `Ve • Ghe ${seat.seatName} (${seat.type})`,
+          name: `Ve - Ghe ${seat.seatName} (${seat.type})`,
           price: seat.price,
         },
       ]);
@@ -190,65 +191,68 @@ const StaffPOSPage = () => {
   const sortedRows = Object.keys(groupedByRow).sort();
 
   return (
-    <div className="flex flex-col w-full h-[calc(100vh-80px)] overflow-hidden bg-background">
+    <div className="flex flex-col w-full h-[calc(100vh-80px)] overflow-hidden bg-slate-50">
       <div className="flex h-full w-full overflow-hidden">
         {/* Left Panel: Showtimes / Seat Map / Snacks */}
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
           {!selectedShowtime ? (
             <div>
-              <div className="flex items-center justify-between pb-4 mb-6 border-b border-surface-container-highest">
+              <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200">
                 <div>
-                  <h1 className="text-2xl font-black text-on-surface">Ban Ve Quay POS</h1>
-                  <p className="text-on-surface-variant text-sm">Chon suat chieu de bat dau phuc vu khach hang.</p>
+                  <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-blue-600">point_of_sale</span>
+                    Ban Ve Quay POS
+                  </h1>
+                  <p className="text-slate-500 text-xs mt-0.5">Chon suat chieu de bat dau phuc vu khach hang.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1.5 rounded-full bg-primary/10 text-primary font-bold text-xs border border-primary/20">
+                  <span className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-semibold text-xs border border-blue-200">
                     CUM RAP #{cinemaId || 'N/A'}
                   </span>
                 </div>
               </div>
 
               {loading ? (
-                <div className="text-center py-20 text-on-surface-variant">Dang tai du lieu suat chieu...</div>
+                <div className="text-center py-20 text-slate-500 text-xs">Dang tai du lieu suat chieu...</div>
               ) : showtimes.length === 0 ? (
-                <div className="text-center py-20 text-on-surface-variant bg-surface-container/30 rounded-2xl">
+                <div className="text-center py-20 text-slate-500 bg-white rounded-xl border border-slate-200 shadow-sm text-xs">
                   Chua co suat chieu nao hom nay cho cum rap nay.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {showtimes.map((st) => {
                     const movie = movies.find((m) => m.id === st.movie?.id);
                     return (
                       <div
                         key={st.id}
                         onClick={() => fetchSeatsForShowtime(st)}
-                        className="group cursor-pointer bg-surface-container hover:bg-surface-container-high rounded-2xl p-5 border border-surface-container-highest transition-all duration-200 shadow-md hover:shadow-xl flex flex-col justify-between"
+                        className="group cursor-pointer bg-white hover:bg-blue-50/30 rounded-xl p-4 border border-slate-200 hover:border-blue-300 transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between"
                       >
                         <div>
                           <div className="flex items-start gap-4">
                             <img
                               src={movie?.posterUrl || 'https://via.placeholder.com/150'}
                               alt={movie?.title}
-                              className="w-20 h-28 object-cover rounded-xl shadow-md shrink-0"
+                              className="w-20 h-28 object-cover rounded-lg shadow-sm shrink-0"
                             />
                             <div className="min-w-0">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-primary/20 text-primary">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-600 border border-blue-200">
                                 {st.room?.roomType || '2D'}
                               </span>
-                              <h3 className="text-lg font-bold text-on-surface truncate mt-1 group-hover:text-primary transition-colors">
+                              <h3 className="text-sm font-bold text-slate-900 truncate mt-1.5 group-hover:text-blue-600 transition-colors">
                                 {st.movie?.title || 'Phim'}
                               </h3>
-                              <p className="text-xs text-on-surface-variant mt-0.5">{st.room?.name}</p>
-                              <p className="text-sm font-extrabold text-primary mt-2">
+                              <p className="text-xs text-slate-500 mt-0.5">{st.room?.name}</p>
+                              <p className="text-sm font-bold text-blue-600 mt-2">
                                 {st.price?.toLocaleString('vi-VN')} d
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="mt-4 pt-3 border-t border-surface-container-highest/60 flex items-center justify-between">
-                          <span className="text-xs font-semibold text-on-surface-variant">Gio chieu:</span>
-                          <span className="px-3 py-1 rounded-lg bg-surface-container-highest text-on-surface font-black text-sm">
+                        <div className="mt-3 pt-3 border-t border-slate-200 flex items-center justify-between">
+                          <span className="text-xs font-medium text-slate-500">Gio chieu:</span>
+                          <span className="px-3 py-1 rounded-lg bg-slate-100 text-slate-900 font-bold text-sm border border-slate-200">
                             {st.startTime ? new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
                           </span>
                         </div>
@@ -261,23 +265,23 @@ const StaffPOSPage = () => {
           ) : (
             <div className="flex flex-col gap-6">
               {/* Top Header of Seat View */}
-              <div className="flex items-center justify-between bg-surface-container/70 backdrop-blur-md rounded-2xl p-4 border border-surface-container-highest">
+              <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => {
                       setSelectedShowtime(null);
                       setCartItems([]);
                     }}
-                    className="p-2 rounded-xl bg-surface-container-highest hover:bg-surface-bright text-on-surface transition-colors"
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                   </button>
                   <div>
-                    <h2 className="text-lg font-bold text-on-surface">
-                      {selectedShowtime.movie?.title} • {selectedShowtime.room?.name}
+                    <h2 className="text-sm font-bold text-slate-900">
+                      {selectedShowtime.movie?.title} - {selectedShowtime.room?.name}
                     </h2>
-                    <p className="text-xs text-on-surface-variant">
-                      Suat: {selectedShowtime.startTime ? new Date(selectedShowtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''} • Gia goc: {selectedShowtime.price?.toLocaleString('vi-VN')} d
+                    <p className="text-xs text-slate-500">
+                      Suat: {selectedShowtime.startTime ? new Date(selectedShowtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''} | Gia goc: {selectedShowtime.price?.toLocaleString('vi-VN')} d
                     </p>
                   </div>
                 </div>
@@ -285,33 +289,33 @@ const StaffPOSPage = () => {
                 {/* Legend */}
                 <div className="flex items-center gap-4 flex-wrap text-xs">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded bg-surface-container-highest border border-surface-bright"></div>
-                    <span className="text-on-surface-variant">Trong</span>
+                    <div className="w-5 h-5 rounded bg-slate-100 border border-slate-300"></div>
+                    <span className="text-slate-500">Trong</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded bg-primary text-on-primary flex items-center justify-center font-bold text-[10px]">✓</div>
-                    <span className="text-on-surface-variant">Ban chon</span>
+                    <div className="w-5 h-5 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">V</div>
+                    <span className="text-slate-500">Ban chon</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded bg-amber-500/80 text-black flex items-center justify-center font-bold text-[10px]">H</div>
-                    <span className="text-on-surface-variant">Dang giu (5p)</span>
+                    <div className="w-5 h-5 rounded bg-amber-400 text-white flex items-center justify-center font-bold text-[10px]">H</div>
+                    <span className="text-slate-500">Dang giu (5p)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded bg-[#222] text-on-surface-variant/40 flex items-center justify-center font-bold text-[10px]">✕</div>
-                    <span className="text-on-surface-variant">Da ban</span>
+                    <div className="w-5 h-5 rounded bg-slate-300 text-slate-400 flex items-center justify-center font-bold text-[10px]">X</div>
+                    <span className="text-slate-500">Da ban</span>
                   </div>
                 </div>
               </div>
 
               {/* Real Seat Map Grid */}
-              <div className="bg-surface-container/40 rounded-3xl p-6 border border-surface-container-highest flex flex-col items-center overflow-x-auto">
-                <div className="w-3/4 h-2 rounded-full bg-gradient-to-r from-transparent via-primary/50 to-transparent mb-2" />
-                <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-6">MAN CHIEU</p>
+              <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col items-center overflow-x-auto">
+                <div className="w-3/4 h-2 rounded-full bg-gradient-to-r from-transparent via-blue-400/60 to-transparent mb-2" />
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-6 font-semibold">MAN CHIEU</p>
 
                 <div className="flex flex-col gap-2 min-w-max">
                   {sortedRows.map((rowLabel) => (
                     <div key={rowLabel} className="flex items-center gap-2">
-                      <span className="w-6 text-center text-xs font-bold text-on-surface-variant">{rowLabel}</span>
+                      <span className="w-6 text-center text-xs font-bold text-slate-400">{rowLabel}</span>
                       <div className="flex gap-1.5">
                         {groupedByRow[rowLabel]
                           .sort((a, b) => a.seatColumn - b.seatColumn)
@@ -320,18 +324,18 @@ const StaffPOSPage = () => {
                             const isHoldingByOther = seat.status === 'HOLDING' && !isMine && seat.heldByUserId !== user?.id;
                             const isBooked = seat.status === 'BOOKED';
 
-                            let bgClass = TYPE_COLOR[seat.type]?.bg || 'bg-surface-container-highest';
-                            let textClass = TYPE_COLOR[seat.type]?.text || 'text-on-surface';
+                            let bgClass = TYPE_COLOR[seat.type]?.bg || 'bg-slate-100 border border-slate-300';
+                            let textClass = TYPE_COLOR[seat.type]?.text || 'text-slate-700';
 
                             if (isBooked) {
-                              bgClass = 'bg-[#181818] border border-surface-container-highest cursor-not-allowed opacity-50';
-                              textClass = 'text-on-surface-variant/30';
+                              bgClass = 'bg-slate-200 border border-slate-300 cursor-not-allowed opacity-50';
+                              textClass = 'text-slate-400';
                             } else if (isMine) {
-                              bgClass = 'bg-primary text-on-primary ring-2 ring-primary-fixed shadow-lg shadow-primary/30';
-                              textClass = 'text-on-primary';
+                              bgClass = 'bg-blue-600 ring-2 ring-blue-300 shadow-lg shadow-blue-200 border-none';
+                              textClass = 'text-white';
                             } else if (isHoldingByOther) {
-                              bgClass = 'bg-amber-500 text-black animate-pulse cursor-not-allowed';
-                              textClass = 'text-black font-extrabold';
+                              bgClass = 'bg-amber-400 animate-pulse cursor-not-allowed border-none';
+                              textClass = 'text-white font-extrabold';
                             }
 
                             return (
@@ -339,24 +343,24 @@ const StaffPOSPage = () => {
                                 key={seat.seatId}
                                 disabled={isBooked || isHoldingByOther}
                                 onClick={() => handleSeatClick(seat)}
-                                title={`${seat.seatName} • ${seat.type} • ${seat.price?.toLocaleString('vi-VN')} d`}
-                                className={`w-8 h-8 rounded-lg text-xs font-bold transition-all duration-150 relative flex items-center justify-center ${bgClass} ${textClass}`}
+                                title={`${seat.seatName} - ${seat.type} - ${seat.price?.toLocaleString('vi-VN')} d`}
+                                className={`w-8 h-8 rounded-lg text-xs font-bold transition-all duration-150 relative flex items-center justify-center cursor-pointer ${bgClass} ${textClass}`}
                               >
-                                {isBooked ? '✕' : isMine ? '✓' : isHoldingByOther ? 'H' : seat.seatColumn}
+                                {isBooked ? 'X' : isMine ? 'V' : isHoldingByOther ? 'H' : seat.seatColumn}
                               </button>
                             );
                           })}
                       </div>
-                      <span className="w-6 text-center text-xs font-bold text-on-surface-variant">{rowLabel}</span>
+                      <span className="w-6 text-center text-xs font-bold text-slate-400">{rowLabel}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* F&B Snacks Section */}
-              <div className="bg-surface-container/70 rounded-2xl p-5 border border-surface-container-highest">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[20px]">fastfood</span>
+              <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-blue-600 text-[20px]">fastfood</span>
                   Combo Bap Nuoc Uu Dai
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -364,14 +368,14 @@ const StaffPOSPage = () => {
                     <div
                       key={snack.id}
                       onClick={() => handleAddSnack(snack)}
-                      className="cursor-pointer bg-surface-container-highest hover:bg-surface-bright rounded-xl p-3 border border-surface-container-highest transition-all text-center flex flex-col justify-between shadow-sm active:scale-95"
+                      className="cursor-pointer bg-slate-50 hover:bg-blue-50 rounded-xl p-3 border border-slate-200 hover:border-blue-300 transition-all text-center flex flex-col justify-between shadow-sm active:scale-95"
                     >
                       <div>
-                        <span className="material-symbols-outlined text-3xl text-amber-400 mb-1">{snack.icon}</span>
-                        <p className="text-xs font-bold text-on-surface line-clamp-1">{snack.name}</p>
-                        <p className="text-[10px] text-on-surface-variant line-clamp-1">{snack.desc}</p>
+                        <span className="material-symbols-outlined text-3xl text-amber-500 mb-1">{snack.icon}</span>
+                        <p className="text-xs font-bold text-slate-900 line-clamp-1">{snack.name}</p>
+                        <p className="text-[10px] text-slate-500 line-clamp-1">{snack.desc}</p>
                       </div>
-                      <p className="text-xs font-black text-primary mt-2">{snack.price.toLocaleString('vi-VN')} d</p>
+                      <p className="text-xs font-bold text-blue-600 mt-2">{snack.price.toLocaleString('vi-VN')} d</p>
                     </div>
                   ))}
                 </div>
@@ -381,41 +385,42 @@ const StaffPOSPage = () => {
         </div>
 
         {/* Right Panel: Cart & Checkout Billing */}
-        <div className="w-96 bg-surface-container/90 backdrop-blur-xl flex flex-col border-l border-surface-container-highest shadow-2xl z-20">
-          <div className="p-5 bg-surface-container-lowest border-b border-surface-container-highest flex items-center justify-between">
+        <div className="w-96 bg-white flex flex-col border-l border-slate-200 shadow-xl z-20">
+          <div className="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">receipt_long</span> Don Hang Hien Tai
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span className="material-symbols-outlined text-blue-600 text-[20px]">receipt_long</span>
+                Don Hang Hien Tai
               </h2>
-              <p className="text-xs text-on-surface-variant">Thu Ngan: {user?.username || 'Staff'}</p>
+              <p className="text-xs text-slate-500">Thu Ngan: {user?.username || 'Staff'}</p>
             </div>
-            <span className="px-2.5 py-1 rounded-lg bg-surface-container-highest text-on-surface font-bold text-xs">
+            <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 font-semibold text-xs border border-blue-200">
               {cartItems.length} muc
             </span>
           </div>
 
           {/* Cart Item List */}
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
             {cartItems.length === 0 ? (
-              <div className="text-center py-20 text-on-surface-variant text-sm italic">
+              <div className="text-center py-20 text-slate-400 text-sm">
                 Chua co ve hoac bap nuoc nao duoc chon.
               </div>
             ) : (
               cartItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-surface-container border border-surface-container-highest shadow-sm"
+                  className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200"
                 >
                   <div className="min-w-0 flex-1 pr-2">
-                    <p className="text-xs font-bold text-on-surface truncate">{item.name}</p>
-                    <p className="text-xs text-primary font-black mt-0.5">
+                    <p className="text-xs font-bold text-slate-900 truncate">{item.name}</p>
+                    <p className="text-xs text-blue-600 font-bold mt-0.5">
                       {(item.price * (item.qty || 1)).toLocaleString('vi-VN')} d
-                      {item.qty > 1 && <span className="text-[10px] text-on-surface-variant font-normal"> (x{item.qty})</span>}
+                      {item.qty > 1 && <span className="text-[10px] text-slate-400 font-normal"> (x{item.qty})</span>}
                     </p>
                   </div>
                   <button
                     onClick={() => handleRemoveCartItem(item.id)}
-                    className="p-1 rounded-lg hover:bg-surface-container-highest text-on-surface-variant hover:text-red-400 transition-colors"
+                    className="p-1 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-[18px]">delete</span>
                   </button>
@@ -425,10 +430,10 @@ const StaffPOSPage = () => {
           </div>
 
           {/* Checkout Section */}
-          <div className="p-5 bg-surface-container-lowest border-t border-surface-container-highest flex flex-col gap-3">
-            <div className="flex justify-between items-end pb-2 border-b border-surface-container-highest">
-              <span className="text-xs uppercase font-bold text-on-surface-variant">Tong thanh toan</span>
-              <span className="text-2xl font-black text-primary">{subtotal.toLocaleString('vi-VN')} d</span>
+          <div className="p-5 bg-slate-50 border-t border-slate-200 flex flex-col gap-3">
+            <div className="flex justify-between items-end pb-2 border-b border-slate-200">
+              <span className="text-xs uppercase font-bold text-slate-500">TONG THANH TOAN</span>
+              <span className="text-2xl font-black text-blue-600">{subtotal.toLocaleString('vi-VN')} d</span>
             </div>
 
             {/* Payment Method Selector */}
@@ -441,10 +446,10 @@ const StaffPOSPage = () => {
                 <button
                   key={m.id}
                   onClick={() => setPaymentMethod(m.id)}
-                  className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-xs font-bold transition-all border ${
+                  className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-xs font-semibold transition-all border cursor-pointer ${
                     paymentMethod === m.id
-                      ? 'bg-primary/20 border-primary text-primary shadow-sm'
-                      : 'bg-surface-container border-transparent text-on-surface-variant hover:bg-surface-container-high'
+                      ? 'bg-blue-50 border-blue-300 text-blue-600 shadow-sm'
+                      : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100'
                   }`}
                 >
                   <span className="material-symbols-outlined text-[18px]">{m.icon}</span>
@@ -456,18 +461,18 @@ const StaffPOSPage = () => {
             {/* Cash Given Input */}
             {paymentMethod === 'CASH' && (
               <div className="flex flex-col gap-1 mt-1">
-                <div className="flex items-center justify-between text-xs font-bold text-on-surface-variant">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
                   <span>Tien khach dua:</span>
                   <input
                     type="number"
                     value={cashGiven}
                     onChange={(e) => setCashGiven(e.target.value)}
                     placeholder="VD: 200000"
-                    className="w-28 bg-surface-container rounded-lg px-2 py-1 text-right text-on-surface font-bold border border-surface-container-highest focus:border-primary focus:outline-none"
+                    className="w-28 bg-white rounded-lg px-2 py-1 text-right text-slate-900 font-bold border border-slate-200 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
                 {Number(cashGiven) > 0 && (
-                  <div className="flex items-center justify-between text-xs font-bold text-green-400">
+                  <div className="flex items-center justify-between text-xs font-bold text-emerald-600">
                     <span>Tien thoi lai:</span>
                     <span>{changeMoney.toLocaleString('vi-VN')} d</span>
                   </div>
@@ -478,7 +483,7 @@ const StaffPOSPage = () => {
             <button
               disabled={cartItems.length === 0}
               onClick={handleCheckout}
-              className="w-full py-3.5 mt-2 rounded-xl bg-primary text-on-primary hover:bg-primary-fixed font-black text-sm shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 mt-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-sm shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[20px]">print</span>
               THANH TOAN VA IN VE
@@ -490,40 +495,40 @@ const StaffPOSPage = () => {
       {/* Ticket Print Modal */}
       {printTicketModal && lastOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" onClick={() => setPrintTicketModal(false)} />
-          <div className="relative bg-surface rounded-3xl p-6 w-full max-w-sm border border-surface-container-highest shadow-2xl flex flex-col gap-4 text-on-surface">
-            <div className="text-center pb-3 border-b border-dashed border-surface-container-highest">
-              <h3 className="text-xl font-black text-primary uppercase">Ve Xem Phim CGV</h3>
-              <p className="text-xs text-on-surface-variant">Ma don: {lastOrder.orderId} • {lastOrder.time}</p>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setPrintTicketModal(false)} />
+          <div className="relative bg-white rounded-2xl p-6 w-full max-w-sm border border-slate-200 shadow-2xl flex flex-col gap-4 text-slate-900">
+            <div className="text-center pb-3 border-b border-dashed border-slate-300">
+              <h3 className="text-lg font-bold text-blue-600 uppercase">Ve Xem Phim CineMax</h3>
+              <p className="text-xs text-slate-500">Ma don: {lastOrder.orderId} | {lastOrder.time}</p>
             </div>
 
             <div className="flex flex-col gap-1.5 text-xs">
-              <p><span className="text-on-surface-variant">Phim:</span> <strong className="text-on-surface">{lastOrder.showtime?.movie?.title}</strong></p>
-              <p><span className="text-on-surface-variant">Phong:</span> {lastOrder.showtime?.room?.name} ({lastOrder.showtime?.room?.roomType})</p>
-              <p><span className="text-on-surface-variant">Gio chieu:</span> {lastOrder.showtime?.startTime ? new Date(lastOrder.showtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}</p>
-              <div className="mt-2 pt-2 border-t border-surface-container-highest/60">
-                <span className="text-on-surface-variant">Chi tiet:</span>
+              <p><span className="text-slate-500">Phim:</span> <strong className="text-slate-900">{lastOrder.showtime?.movie?.title}</strong></p>
+              <p><span className="text-slate-500">Phong:</span> {lastOrder.showtime?.room?.name} ({lastOrder.showtime?.room?.roomType})</p>
+              <p><span className="text-slate-500">Gio chieu:</span> {lastOrder.showtime?.startTime ? new Date(lastOrder.showtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}</p>
+              <div className="mt-2 pt-2 border-t border-slate-200">
+                <span className="text-slate-500">Chi tiet:</span>
                 {lastOrder.items.map((i) => (
-                  <div key={i.id} className="flex justify-between font-bold text-xs py-0.5">
+                  <div key={i.id} className="flex justify-between font-semibold text-xs py-0.5">
                     <span>{i.name}</span>
                     <span>{(i.price * (i.qty || 1)).toLocaleString('vi-VN')} d</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-2 pt-2 border-t border-surface-container-highest flex justify-between text-sm font-black text-primary">
+              <div className="mt-2 pt-2 border-t border-slate-300 flex justify-between text-sm font-bold text-blue-600">
                 <span>TONG TIEN:</span>
                 <span>{lastOrder.total.toLocaleString('vi-VN')} d</span>
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center py-3 bg-surface-container rounded-2xl border border-surface-container-highest">
-              <span className="material-symbols-outlined text-5xl text-on-surface mb-1">qr_code_2</span>
-              <span className="text-[10px] tracking-widest text-on-surface-variant uppercase">{lastOrder.orderId}</span>
+            <div className="flex flex-col items-center justify-center py-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span className="material-symbols-outlined text-5xl text-slate-700 mb-1">qr_code_2</span>
+              <span className="text-[10px] tracking-widest text-slate-500 uppercase">{lastOrder.orderId}</span>
             </div>
 
             <button
               onClick={() => setPrintTicketModal(false)}
-              className="w-full py-2.5 rounded-xl bg-primary text-on-primary font-bold text-sm shadow-md"
+              className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm cursor-pointer"
             >
               HOAN TAT
             </button>

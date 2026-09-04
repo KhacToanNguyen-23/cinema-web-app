@@ -2,6 +2,24 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [04-09-2026 23:43] - Đồng Bộ Hóa Toàn Bộ Giao Diện Staff POS Sang Enterprise Light Theme
+### Changed (Thay đổi)
+- `StaffPOSPage.jsx`: Chuyển đổi toàn bộ giao diện Bán Vé Quầy POS từ Dark Cinema Theme sang Enterprise Light Theme chuẩn SaaS (`bg-slate-50`, `bg-white`, `text-slate-900`, `text-blue-600`). Bao gồm: Card suất chiếu, Sơ đồ ghế, Combo bắp nước, Giỏ hàng, Thanh toán và Modal in vé.
+- `StaffTicketsPage.jsx`: Chuyển đổi giao diện Quản lý Vé sang Enterprise Light Theme.
+- `StaffFoodPage.jsx`: Chuyển đổi giao diện Quầy Bắp Nước sang Enterprise Light Theme.
+
+## [04-09-2026 23:29] - Fix Lỗi Điều Huống Staff POS & Bổ Sung Trang Manage Tickets, Concession Stand
+### Added (Thêm mới)
+- `StaffTicketsPage.jsx`: Thêm trang Quản lý Vé & Soát Vé QR dành cho nhân viên Staff Box Office (Tra cứu mã đặt vé/SĐT, soát vé tại cửa, xem chi tiết vé).
+- `StaffFoodPage.jsx`: Thêm trang Quầy Bắp Nước độc lập dành cho nhân viên (Menu combo bắp nước, quản lý tồn kho và thanh toán hóa đơn lẻ).
+
+### Changed (Thay đổi)
+- `AppRoutes.jsx`: Khai báo 2 route tương ứng `/staff/tickets` (`StaffTicketsPage`) và `/staff/food` (`StaffFoodPage`) dưới nhánh `/staff`, khắc phục triệt để lỗi chuyển hướng văng về trang chủ khi click menu sidebar.
+
+## [04-09-2026 23:27] - Chuẩn Hóa Đồng Bộ Giao Diện Đăng Nhập (Login UI)
+### Changed (Thay đổi)
+- `LoginPage.jsx`: Tái cấu trúc và thiết kế lại giao diện trang đăng nhập (`/login`) thống nhất 100% theo style của `LoginModal` (Ảnh 2): Bổ sung 4 pill demo tài khoản kèm icon Material Symbols (`Admin`, `Manager`, `Staff`, `Customer`), đường phân cách *"HOẶC NHẬP THỦ CÔNG"*, nút Đăng nhập màu hồng nổi bật và tự động điều hướng theo quyền (STAFF $\rightarrow$ `/staff/pos`, ADMIN/MANAGER $\rightarrow$ `/admin/dashboard`, CUSTOMER $\rightarrow$ `/`).
+
 ## [02-09-2026 22:54] - Translate README.md to English & Omit Sensitive Documents Section
 ### Changed (Thay đổi)
 - `README.md`: Chuyển đổi toàn bộ nội dung tài liệu SRS sang tiếng Anh chuẩn Enterprise (Functional Requirements, Non-Functional Requirements, Seat State Machine, RBAC Matrix, Technology Stack Architecture) và loại bỏ hoàn toàn Mục 7 (Tài liệu tham chiếu / tệp nhạy cảm).

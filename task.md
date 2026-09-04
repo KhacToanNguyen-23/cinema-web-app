@@ -1,6 +1,8 @@
-# Tasks: Translate README.md to English & Omit Sensitive Docs Section
+# Tasks: Standardize Login UI & Staff Portal Light Theme
 
-- [x] Create Implementation Plan & wait for user approval ("Proceed") <!-- id: 0 -->
-- [x] Translate `README.md` to English SRS format <!-- id: 1 -->
-- [x] Remove Section 7 (Reference Documents & sensitive file references) from `README.md` <!-- id: 2 -->
-- [x] Verify formatting, Mermaid diagrams, and language accuracy <!-- id: 3 -->
+- [x] Redesign `LoginPage.jsx` to match Image 2 (`LoginModal` design & demo account pills) <!-- id: 0 -->
+- [x] Register `/staff/tickets` and `/staff/food` in `AppRoutes.jsx` to fix navigation kicks <!-- id: 1 -->
+- [x] Create UI for `StaffTicketsPage.jsx` and `StaffFoodPage.jsx` (No mock data, clean empty states) <!-- id: 2 -->
+- [x] Convert all Staff pages (`StaffPOSPage`, `StaffTicketsPage`, `StaffFoodPage`) to Enterprise Light Theme <!-- id: 3 -->
+- [x] Record all changes in `CHANGELOG.md` with real-time timestamps <!-- id: 4 -->
+- [x] Commit and push changes to GitHub following git conventions <!-- id: 5 -->
