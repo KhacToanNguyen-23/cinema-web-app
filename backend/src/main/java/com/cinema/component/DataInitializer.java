@@ -80,7 +80,16 @@ public class DataInitializer implements CommandLineRunner {
     private final com.cinema.repository.ShowtimeRepository showtimeRepository;
 
     private void initCinemaData() {
-        if (regionRepository.count() > 0) return; // Nếu đã có dữ liệu thì không tạo lại
+        if (regionRepository.count() > 0) {
+            // [AI UPDATE - Cap nhat poster cho phim cu neu posterUrl dang bi null trong CSDL]
+            movieRepository.findAll().forEach(m -> {
+                if (m.getPosterUrl() == null || m.getPosterUrl().isEmpty()) {
+                    m.setPosterUrl("https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80");
+                    movieRepository.save(m);
+                }
+            });
+            return;
+        }
 
         // 1. Tạo Region
         com.cinema.entity.Region region = new com.cinema.entity.Region();
@@ -121,10 +130,12 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // 5. Tạo Movie
+        // [AI UPDATE - Bo sung posterUrl cho phim khoi tao mau]
         com.cinema.entity.Movie movie = new com.cinema.entity.Movie();
         movie.setTitle("Avenger: Endgame");
         movie.setDescription("Siêu phẩm Marvel");
         movie.setDuration(181);
+        movie.setPosterUrl("https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80");
         movie.setActive(true);
         movie = movieRepository.save(movie);
 

@@ -224,7 +224,8 @@ const UserManagementPage = () => {
       {/* Modal Thêm/Sửa User */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in duration-150">
+          {/* [AI UPDATE - Fix modal bi co hep que tam bang class max-w-[520px] w-full] */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-[520px] w-full p-6 space-y-4 animate-in fade-in zoom-in duration-150">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="font-bold text-slate-900 text-base">
                 {formData.id ? 'Cập Nhật & Phân Quyền' : 'Tạo Tài Khoản Mới'}

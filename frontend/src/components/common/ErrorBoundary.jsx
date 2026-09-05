@@ -22,7 +22,8 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 text-slate-100">
-          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center shadow-2xl">
+          {/* [AI UPDATE - Fix modal bi co hep que tam bang class max-w-[480px]] */}
+          <div className="max-w-[480px] w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center shadow-2xl">
             <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="material-symbols-outlined text-3xl">warning</span>
             </div>

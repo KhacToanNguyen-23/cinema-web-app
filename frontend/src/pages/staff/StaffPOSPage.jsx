@@ -496,7 +496,8 @@ const StaffPOSPage = () => {
       {printTicketModal && lastOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setPrintTicketModal(false)} />
-          <div className="relative bg-white rounded-2xl p-6 w-full max-w-sm border border-slate-200 shadow-2xl flex flex-col gap-4 text-slate-900">
+          {/* [AI UPDATE - Fix modal bi co hep que tam bang class max-w-[420px]] */}
+          <div className="relative bg-white rounded-2xl p-6 w-full max-w-[420px] border border-slate-200 shadow-2xl flex flex-col gap-4 text-slate-900">
             <div className="text-center pb-3 border-b border-dashed border-slate-300">
               <h3 className="text-lg font-bold text-blue-600 uppercase">Ve Xem Phim CineMax</h3>
               <p className="text-xs text-slate-500">Ma don: {lastOrder.orderId} | {lastOrder.time}</p>

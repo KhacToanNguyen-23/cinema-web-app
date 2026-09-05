@@ -353,7 +353,8 @@ const BookingSeatPage = () => {
             className="absolute inset-0 bg-background/80 backdrop-blur-xl"
             onClick={() => !bookingSuccess && setShowConfirmModal(false)}
           />
-          <div className="relative bg-surface rounded-3xl p-6 w-full max-w-md border border-surface-container-highest shadow-2xl flex flex-col gap-5 text-on-surface">
+          {/* [AI UPDATE - Fix modal bi co hep que tam bang class max-w-[480px]] */}
+          <div className="relative bg-surface rounded-3xl p-6 w-full max-w-[480px] border border-surface-container-highest shadow-2xl flex flex-col gap-5 text-on-surface">
             {!bookingSuccess ? (
               <>
                 <div className="text-center pb-3 border-b border-surface-container-highest">

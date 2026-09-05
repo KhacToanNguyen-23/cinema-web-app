@@ -5,6 +5,9 @@ import { showtimeApi } from '../../api/showtimeApi';
 import { cinemaApi } from '../../api/cinemaApi';
 import { regionApi } from '../../api/regionApi';
 
+// [AI UPDATE - Dinh nghia anh fallback poster mac dinh tranh vo anh khi Cloudinary url bi loi hoac null]
+const DEFAULT_POSTER = 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80';
+
 const MovieDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -179,7 +182,7 @@ const MovieDetailPage = () => {
         <div
           className="absolute inset-0 z-0 opacity-30 mix-blend-screen scale-110 blur-2xl"
           style={{
-            backgroundImage: `url('${movie.posterUrl || "https://placehold.co/1200x600"}')`,
+            backgroundImage: `url('${movie.posterUrl || DEFAULT_POSTER}')`,
             backgroundPosition: 'center',
             backgroundSize: 'cover',
           }}
@@ -189,10 +192,15 @@ const MovieDetailPage = () => {
         <div className="relative max-w-7xl mx-auto px-6 w-full flex flex-col md:flex-row items-center md:items-end gap-8 z-10">
           {/* Poster Card */}
           <div className="w-52 md:w-64 shrink-0 rounded-2xl overflow-hidden shadow-2xl border border-surface-container-highest">
+            {/* [AI UPDATE - Xu ly fallback poster va onError cho anh chi tiet phim] */}
             <img
-              src={movie.posterUrl || "https://placehold.co/400x600"}
+              src={movie.posterUrl || DEFAULT_POSTER}
               alt={movie.title}
-              className="w-full h-auto object-cover"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = DEFAULT_POSTER;
+              }}
+              className="w-full h-auto aspect-[2/3] object-cover"
             />
           </div>
 

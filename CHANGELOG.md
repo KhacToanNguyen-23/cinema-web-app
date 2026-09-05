@@ -2,6 +2,20 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [05-09-2026 17:14] - Fix Loi Modal Admin Co Hep Que Tam va Fallback Poster Phim
+### Fixed (Sua loi)
+- `index.css`: Bo sung cac utility `@utility max-w-*` voi thuoc tinh `!important` nham ngan chan triet de xung dot giua spacing tokens cua Tailwind CSS v4 va he thong container width, khac phuc loi cac modal bi co hep thanh que doc 16px - 48px tren toan bo he thong.
+- `AdminMoviePage.jsx`: Cap nhat modal them/sua phim su dung `max-w-[640px] w-full` de form thong tin va upload poster Cloudinary hien thi day du, can doi.
+- `AdminRoomPage.jsx`: Cap nhat modal them/sua phong chieu sang `max-w-[500px] w-full`.
+- `AdminCinemaPage.jsx`: Cap nhat modal them/sua cum rap sang `max-w-[500px] w-full`.
+- `UserManagementPage.jsx`: Cap nhat modal nguoi dung sang `max-w-[520px] w-full`.
+- `StaffPOSPage.jsx`: Cap nhat modal in ve POS sang `max-w-[420px] w-full`.
+- `BookingSeatPage.jsx`: Cap nhat modal xac nhan dat ve sang `max-w-[480px] w-full`.
+- `ErrorBoundary.jsx`: Cap nhat modal bao loi sang `max-w-[480px] w-full`.
+- `LandingPage.jsx`: Bo sung bien `DEFAULT_POSTER` va su kien `onError` cho poster hero phim noi bat va danh sach the phim, tranh hien thi icon anh vo khi posterUrl bi null hoac anh Cloudinary gap su co mang.
+- `MovieDetailPage.jsx`: Bo sung bien `DEFAULT_POSTER` va su kien `onError` cho anh poster chi tiet phim va anh nen blur.
+- `DataInitializer.java`: Bo sung `posterUrl` mac dinh khi khoi tao phim moi, dong thoi tu dong va (patch) cac phim cu trong CSDL dang bi thieu `posterUrl`.
+
 ## [05-09-2026 16:38] - Fix Loi CORS Preflight OPTIONS va Hoan Thien Deploy Cloud
 ### Changed (Thay doi)
 - `SecurityConfig.java`: Cho phep moi request HTTP OPTIONS (preflight) di qua ma khong yeu cau xac thuc qua `.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()`, dong thoi khai bao tuong minh danh sach allowed headers chuan Enterprise (`Authorization`, `Content-Type`, `Accept`, `X-Requested-With`, `Origin`, `Access-Control-Request-Method`, `Access-Control-Request-Headers`) de khac phuc triet de loi 404 Preflight CORS khi goi API tu Frontend Vercel sang Backend Render.

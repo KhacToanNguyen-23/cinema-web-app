@@ -12,3 +12,9 @@
 - [x] Record changes in `CHANGELOG.md` with real-time timestamps <!-- id: 7 -->
 - [x] Commit and push changes to GitHub master branch <!-- id: 8 -->
 
+# Tasks: Fix Modal Width Squishing & Poster Image Fallback
+- [x] Remove conflicting spacing variables from `index.css` and fix modal widths across admin pages <!-- id: 9 -->
+- [x] Add fallback image and error handling for movie posters in `LandingPage.jsx` <!-- id: 10 -->
+- [x] Update sample movie poster in `DataInitializer.java` <!-- id: 11 -->
+- [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 12 -->
+- [x] Verify frontend build and push changes to GitHub master <!-- id: 13 -->

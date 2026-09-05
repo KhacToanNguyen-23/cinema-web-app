@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { movieApi } from '../../api/movieApi';
 
+// [AI UPDATE - Dinh nghia anh fallback poster mac dinh tranh vo anh khi Cloudinary url bi loi hoac null]
+const DEFAULT_POSTER = 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80';
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('NOW_SHOWING');
@@ -101,10 +104,15 @@ const LandingPage = () => {
               onClick={() => navigate(`/movies/${featuredMovie.id}`)}
               className="flex w-full md:w-[320px] shrink-0 justify-center md:justify-end cursor-pointer"
             >
+               {/* [AI UPDATE - Xu ly fallback poster va onError cho anh hero phim noi bat] */}
                <img 
-                 src={featuredMovie.posterUrl} 
+                 src={featuredMovie.posterUrl || DEFAULT_POSTER} 
                  alt={featuredMovie.title} 
-                 className="w-[200px] md:w-full h-auto object-cover rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] border border-outline-variant/20 rotate-0 md:rotate-2 hover:rotate-0 transition-transform duration-500" 
+                 onError={(e) => {
+                   e.currentTarget.onerror = null;
+                   e.currentTarget.src = DEFAULT_POSTER;
+                 }}
+                 className="w-[200px] md:w-full h-auto aspect-[2/3] object-cover rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] border border-outline-variant/20 rotate-0 md:rotate-2 hover:rotate-0 transition-transform duration-500" 
                />
             </div>
           </div>
@@ -155,10 +163,15 @@ const LandingPage = () => {
                 onClick={() => navigate(`/movies/${movie.id}`)}
                 className="group relative flex flex-col aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer shadow-lg bg-surface-container"
               >
+                {/* [AI UPDATE - Xu ly fallback poster va onError cho anh the phim trong danh sach] */}
                 <img 
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                  src={movie.posterUrl || "https://placehold.co/400x600?text=No+Poster"} 
+                  src={movie.posterUrl || DEFAULT_POSTER} 
                   alt={movie.title} 
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = DEFAULT_POSTER;
+                  }}
                 />
                 
                 {/* Status Tag */}
