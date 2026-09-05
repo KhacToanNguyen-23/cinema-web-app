@@ -2,6 +2,10 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [05-09-2026 16:38] - Fix Loi CORS Preflight OPTIONS va Hoan Thien Deploy Cloud
+### Changed (Thay doi)
+- `SecurityConfig.java`: Cho phep moi request HTTP OPTIONS (preflight) di qua ma khong yeu cau xac thuc qua `.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()`, dong thoi khai bao tuong minh danh sach allowed headers chuan Enterprise (`Authorization`, `Content-Type`, `Accept`, `X-Requested-With`, `Origin`, `Access-Control-Request-Method`, `Access-Control-Request-Headers`) de khac phuc triet de loi 404 Preflight CORS khi goi API tu Frontend Vercel sang Backend Render.
+
 ## [04-09-2026 23:43] - Đồng Bộ Hóa Toàn Bộ Giao Diện Staff POS Sang Enterprise Light Theme
 ### Changed (Thay đổi)
 - `StaffPOSPage.jsx`: Chuyển đổi toàn bộ giao diện Bán Vé Quầy POS từ Dark Cinema Theme sang Enterprise Light Theme chuẩn SaaS (`bg-slate-50`, `bg-white`, `text-slate-900`, `text-blue-600`). Bao gồm: Card suất chiếu, Sơ đồ ghế, Combo bắp nước, Giỏ hàng, Thanh toán và Modal in vé.

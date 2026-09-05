@@ -25,6 +25,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                // [AI UPDATE - Cho phep tat ca cac request preflight OPTIONS di qua ma khong yeu cau auth]
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
                 // Cho phép đăng nhập/đăng ký
                 .requestMatchers("/api/auth/**").permitAll()
                 
@@ -53,10 +56,18 @@ public class SecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
         // Cấu hình Frontend domain
-        // [AI UPDATE - Cho phep ca localhost va moi domain Vercel goi API]
-        configuration.setAllowedOriginPatterns(java.util.Arrays.asList("http://localhost:*","https://*.vercel.app"));
-        configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type", "Accept"));
+        // [AI UPDATE - Cho phep ca localhost va moi domain Vercel goi API voi danh sach headers chuan Enterprise]
+        configuration.setAllowedOriginPatterns(java.util.Arrays.asList("http://localhost:*", "https://*.vercel.app"));
+        configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedHeaders(java.util.Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "Accept",
+            "X-Requested-With",
+            "Origin",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
         configuration.setAllowCredentials(true);
         
         org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
