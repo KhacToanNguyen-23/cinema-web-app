@@ -2,6 +2,10 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [05-09-2026 17:29] - Toi Uu UX Modal Them Phim (Bo Truong Ngay Khoi Chieu)
+### Changed (Thay doi)
+- `AdminMoviePage.jsx`: Loai bo o nhap `releaseDate` khoi giao dien modal Them/Sua Phim, tra ve bo cuc 2 cot can doi cho Thoi luong va Gioi han do tuoi. He thong tu dong gan moc thoi gian ISO hien tai o backend/logic ngam giup Admin tiet kiem thao tac va de Cinema Manager tu do xep suat chieu tren trang Showtimes.
+
 ## [05-09-2026 17:25] - Fix Loi Parse LocalDateTime Khi Them Phim Moi
 ### Fixed (Sua loi)
 - `AdminMoviePage.jsx`: Chuan hoa truong `releaseDate` sang ISO 8601 LocalDateTime (`YYYY-MM-DDTHH:mm:ss`) truoc khi gui len API de tranh thieu phan thoi gian, dong thoi bo sung o nhap Ngay khoi chieu tren form modal.

@@ -123,6 +123,8 @@ const AdminMoviePage = () => {
         formattedReleaseDate = formData.releaseDate.includes('T')
           ? formData.releaseDate
           : `${formData.releaseDate}T00:00:00`;
+      } else {
+        formattedReleaseDate = new Date().toISOString().split('.')[0];
       }
 
       const payload = {
@@ -329,8 +331,8 @@ const AdminMoviePage = () => {
                     />
                   </div>
 
-                  {/* [AI UPDATE - Bo sung o nhap Ngay khoi chieu truc quan cho phim moi] */}
-                  <div className="grid grid-cols-3 gap-3">
+                  {/* [AI UPDATE - Toi uu UI modal: bo truong Ngay khoi chieu, he thong tu dong gan ngay tao ngam de Manager tu do xep showtime] */}
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block font-semibold text-slate-700 mb-1">Thời lượng (phút) *</label>
                       <input
@@ -356,16 +358,6 @@ const AdminMoviePage = () => {
                         <option value="T16">T16 - Cấm dưới 16t</option>
                         <option value="T18">T18 - Cấm dưới 18t</option>
                       </select>
-                    </div>
-                    <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Ngày khởi chiếu</label>
-                      <input
-                        type="date"
-                        name="releaseDate"
-                        value={formData.releaseDate}
-                        onChange={handleChange}
-                        className="w-full bg-slate-50 text-slate-900 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
-                      />
                     </div>
                   </div>
 

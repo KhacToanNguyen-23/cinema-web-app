@@ -24,3 +24,8 @@
 - [x] Add flexible @JsonFormat pattern to `MovieDto.java` <!-- id: 15 -->
 - [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 16 -->
 - [x] Build and verify frontend + backend, then push to GitHub master <!-- id: 17 -->
+
+# Tasks: Optimize Movie Modal UX (Remove Release Date Input)
+- [x] Remove releaseDate input from `AdminMoviePage.jsx` and keep automatic background assignment <!-- id: 18 -->
+- [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 19 -->
+- [x] Build, verify and push changes to GitHub master <!-- id: 20 -->
