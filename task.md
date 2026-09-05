@@ -8,7 +8,7 @@
 - [x] Commit and push changes to GitHub following git conventions <!-- id: 5 -->
 
 # Tasks: Fix CORS Preflight & Cloud Deployment
-- [/] Update `SecurityConfig.java` to allow HTTP OPTIONS preflight and strict enterprise headers <!-- id: 6 -->
-- [ ] Record changes in `CHANGELOG.md` with real-time timestamps <!-- id: 7 -->
-- [ ] Commit and push changes to GitHub master branch <!-- id: 8 -->
+- [x] Update `SecurityConfig.java` to allow HTTP OPTIONS preflight and strict enterprise headers <!-- id: 6 -->
+- [x] Record changes in `CHANGELOG.md` with real-time timestamps <!-- id: 7 -->
+- [x] Commit and push changes to GitHub master branch <!-- id: 8 -->
 
