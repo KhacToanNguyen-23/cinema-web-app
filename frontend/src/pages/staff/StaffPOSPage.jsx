@@ -9,13 +9,25 @@ import { useSeatWebSocket } from '../../hooks/useSeatWebSocket';
 
 const DEFAULT_POSTER = 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80';
 
+// [AI UPDATE - Chuan hoa tieng Viet co dau cho danh muc combo bap nuoc va bo sung helper getFormatBadge]
 const SNACKS = [
-  { id: 1, name: 'Bap Rang Bo (Vua)', price: 45000, icon: 'local_dining', desc: 'Bap thom mui bo' },
-  { id: 2, name: 'Bap Rang Pho Mai (Lon)', price: 65000, icon: 'local_dining', desc: 'Phu sot pho mai dam da' },
-  { id: 3, name: 'Nuoc Ngot Pepsi 22oz', price: 30000, icon: 'local_drink', desc: 'Lanh thanh mat' },
-  { id: 4, name: 'Combo Solo (1 Bap + 1 Nuoc)', price: 70000, icon: 'fastfood', desc: 'Tiet kiem 10%' },
-  { id: 5, name: 'Combo Couple (1 Bap Lon + 2 Nuoc)', price: 110000, icon: 'restaurant', desc: 'Danh cho 2 nguoi' },
+  { id: 1, name: 'Bắp Rang Bơ (Vừa)', price: 45000, icon: 'local_dining', desc: 'Bắp thơm mùi bơ giòn rụm' },
+  { id: 2, name: 'Bắp Rang Phô Mai (Lớn)', price: 65000, icon: 'local_dining', desc: 'Phủ sốt phô mai đậm đà' },
+  { id: 3, name: 'Nước Ngọt Pepsi 22oz', price: 30000, icon: 'local_drink', desc: 'Ướp lạnh thanh mát' },
+  { id: 4, name: 'Combo Solo (1 Bắp + 1 Nước)', price: 70000, icon: 'fastfood', desc: 'Tiết kiệm 10%' },
+  { id: 5, name: 'Combo Couple (1 Bắp Lớn + 2 Nước)', price: 110000, icon: 'restaurant', desc: 'Dành cho 2 người' },
 ];
+
+const getFormatBadge = (st) => {
+  if (!st) return '2D';
+  if (st.format === 'IMAX_TWO_D' || st.format === 'IMAX') return 'IMAX';
+  if (st.format === 'THREE_D') return '3D';
+  const rt = st.room?.roomType;
+  if (rt === 'IMAX') return 'IMAX';
+  if (rt === 'VIP') return 'VIP';
+  if (rt === 'THREE_D') return '3D';
+  return '2D';
+};
 
 const TYPE_COLOR = {
   NORMAL: { bg: 'bg-slate-100 hover:bg-slate-200 border border-slate-300', label: 'N', text: 'text-slate-700' },
@@ -172,8 +184,9 @@ const StaffPOSPage = () => {
 
     const isMine = cartItems.some((i) => i.id === `seat-${seat.seatId}`);
 
+    // [AI UPDATE - Chuan hoa tieng Viet co dau cho thong bao giu ghe va ten ve trong gio hang]
     if (seat.status === 'HOLDING' && !isMine && seat.heldByUserId !== user?.id) {
-      alert(`Ghe ${seat.seatName} dang duoc khach hang khac giu!`);
+      alert(`Ghế ${seat.seatName} đang được khách hàng khác giữ!`);
       return;
     }
 
@@ -188,7 +201,7 @@ const StaffPOSPage = () => {
           id: `seat-${seat.seatId}`,
           type: 'TICKET',
           seatId: seat.seatId,
-          name: `Ve - Ghe ${seat.seatName} (${seat.type})`,
+          name: `Vé - Ghế ${seat.seatName} (${seat.type})`,
           price: seat.price,
         },
       ]);
@@ -423,28 +436,29 @@ const StaffPOSPage = () => {
                           <span className="text-[11px] text-slate-400 italic">Nhấp vào giờ chiếu để chọn ghế</span>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2.5">
+                        {/* [AI UPDATE - Chuyen doi time pills sang flex-wrap, chuan hoa format badge bang getFormatBadge va chong rot dong gia tien] */}
+                        <div className="flex flex-wrap gap-2.5">
                           {movieSts.map((st) => {
                             const timeText = st.startTime ? new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
-                            const formatBadge = st.format === 'IMAX_TWO_D' ? 'IMAX' : (st.room?.roomType || '2D');
+                            const formatBadge = getFormatBadge(st);
                             return (
                               <button
                                 key={st.id}
                                 type="button"
                                 onClick={() => fetchSeatsForShowtime(st)}
-                                className="group/pill p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-600 hover:border-blue-600 transition-all duration-150 text-left cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between"
+                                className="group/pill min-w-[130px] p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-600 hover:border-blue-600 transition-all duration-150 text-left cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between gap-1.5"
                               >
-                                <div className="flex items-center justify-between w-full mb-1">
-                                  <span className="text-base font-extrabold text-slate-900 group-hover/pill:text-white transition-colors">
+                                <div className="flex items-center justify-between gap-2 w-full">
+                                  <span className="text-base font-black text-slate-900 group-hover/pill:text-white transition-colors tracking-tight">
                                     {timeText}
                                   </span>
-                                  <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white group-hover/pill:bg-blue-500 group-hover/pill:text-white text-slate-600 border border-slate-200 group-hover/pill:border-blue-400">
+                                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-white group-hover/pill:bg-blue-500 group-hover/pill:text-white text-slate-600 border border-slate-200 group-hover/pill:border-blue-400">
                                     {formatBadge}
                                   </span>
                                 </div>
-                                <div className="flex items-center justify-between w-full text-[11px] text-slate-500 group-hover/pill:text-blue-100">
-                                  <span className="truncate max-w-[70px]">{st.room?.name || 'Phòng 1'}</span>
-                                  <span className="font-bold text-blue-600 group-hover/pill:text-white">
+                                <div className="flex items-center justify-between gap-2 w-full text-[11px] text-slate-500 group-hover/pill:text-blue-100">
+                                  <span className="truncate max-w-[65px] font-medium">{st.room?.name || 'Phòng 1'}</span>
+                                  <span className="font-bold text-blue-600 group-hover/pill:text-white whitespace-nowrap">
                                     {st.price?.toLocaleString('vi-VN')} đ
                                   </span>
                                 </div>
@@ -472,12 +486,13 @@ const StaffPOSPage = () => {
                   >
                     <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                   </button>
+                  {/* [AI UPDATE - Chuan hoa tieng Viet co dau va ky hieu tien te đ cho giao dien so do ghe] */}
                   <div>
                     <h2 className="text-sm font-bold text-slate-900">
                       {selectedShowtime.movie?.title} - {selectedShowtime.room?.name}
                     </h2>
                     <p className="text-xs text-slate-500">
-                      Suat: {selectedShowtime.startTime ? new Date(selectedShowtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''} | Gia goc: {selectedShowtime.price?.toLocaleString('vi-VN')} d
+                      Suất: {selectedShowtime.startTime ? new Date(selectedShowtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''} | Giá gốc: {selectedShowtime.price?.toLocaleString('vi-VN')} đ
                     </p>
                   </div>
                 </div>
@@ -486,19 +501,19 @@ const StaffPOSPage = () => {
                 <div className="flex items-center gap-4 flex-wrap text-xs">
                   <div className="flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded bg-slate-100 border border-slate-300"></div>
-                    <span className="text-slate-500">Trong</span>
+                    <span className="text-slate-500">Trống</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">V</div>
-                    <span className="text-slate-500">Ban chon</span>
+                    <span className="text-slate-500">Bạn chọn</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded bg-amber-400 text-white flex items-center justify-center font-bold text-[10px]">H</div>
-                    <span className="text-slate-500">Dang giu (5p)</span>
+                    <span className="text-slate-500">Đang giữ (5p)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded bg-slate-300 text-slate-400 flex items-center justify-center font-bold text-[10px]">X</div>
-                    <span className="text-slate-500">Da ban</span>
+                    <span className="text-slate-500">Đã bán</span>
                   </div>
                 </div>
               </div>
@@ -506,7 +521,7 @@ const StaffPOSPage = () => {
               {/* Real Seat Map Grid */}
               <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col items-center overflow-x-auto">
                 <div className="w-3/4 h-2 rounded-full bg-gradient-to-r from-transparent via-blue-400/60 to-transparent mb-2" />
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-6 font-semibold">MAN CHIEU</p>
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-6 font-semibold">MÀN CHIẾU</p>
 
                 <div className="flex flex-col gap-2 min-w-max">
                   {sortedRows.map((rowLabel) => (
@@ -539,7 +554,7 @@ const StaffPOSPage = () => {
                                 key={seat.seatId}
                                 disabled={isBooked || isHoldingByOther}
                                 onClick={() => handleSeatClick(seat)}
-                                title={`${seat.seatName} - ${seat.type} - ${seat.price?.toLocaleString('vi-VN')} d`}
+                                title={`${seat.seatName} - ${seat.type} - ${seat.price?.toLocaleString('vi-VN')} đ`}
                                 className={`w-8 h-8 rounded-lg text-xs font-bold transition-all duration-150 relative flex items-center justify-center cursor-pointer ${bgClass} ${textClass}`}
                               >
                                 {isBooked ? 'X' : isMine ? 'V' : isHoldingByOther ? 'H' : seat.seatColumn}
@@ -554,10 +569,11 @@ const StaffPOSPage = () => {
               </div>
 
               {/* F&B Snacks Section */}
+              {/* [AI UPDATE - Chuan hoa tieu de combo bap nuoc va ky hieu tien te đ] */}
               <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-blue-600 text-[20px]">fastfood</span>
-                  Combo Bap Nuoc Uu Dai
+                  Combo Bắp Nước Ưu Đãi
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                   {SNACKS.map((snack) => (
@@ -571,7 +587,7 @@ const StaffPOSPage = () => {
                         <p className="text-xs font-bold text-slate-900 line-clamp-1">{snack.name}</p>
                         <p className="text-[10px] text-slate-500 line-clamp-1">{snack.desc}</p>
                       </div>
-                      <p className="text-xs font-bold text-blue-600 mt-2">{snack.price.toLocaleString('vi-VN')} d</p>
+                      <p className="text-xs font-bold text-blue-600 mt-2">{snack.price.toLocaleString('vi-VN')} đ</p>
                     </div>
                   ))}
                 </div>
@@ -580,18 +596,19 @@ const StaffPOSPage = () => {
           )}
         </div>
 
+        {/* [AI UPDATE - Chuan hoa tieng Viet co dau va ky hieu tien te đ cho gio hang, thanh toan va modal in ve] */}
         {/* Right Panel: Cart & Checkout Billing */}
         <div className="w-96 bg-white flex flex-col border-l border-slate-200 shadow-xl z-20">
           <div className="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
             <div>
               <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-600 text-[20px]">receipt_long</span>
-                Don Hang Hien Tai
+                Đơn Hàng Hiện Tại
               </h2>
-              <p className="text-xs text-slate-500">Thu Ngan: {user?.username || 'Staff'}</p>
+              <p className="text-xs text-slate-500">Thu Ngân: {user?.username || 'Staff'}</p>
             </div>
             <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 font-semibold text-xs border border-blue-200">
-              {cartItems.length} muc
+              {cartItems.length} mục
             </span>
           </div>
 
@@ -599,7 +616,7 @@ const StaffPOSPage = () => {
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
             {cartItems.length === 0 ? (
               <div className="text-center py-20 text-slate-400 text-sm">
-                Chua co ve hoac bap nuoc nao duoc chon.
+                Chưa có vé hoặc bắp nước nào được chọn.
               </div>
             ) : (
               cartItems.map((item) => (
@@ -610,7 +627,7 @@ const StaffPOSPage = () => {
                   <div className="min-w-0 flex-1 pr-2">
                     <p className="text-xs font-bold text-slate-900 truncate">{item.name}</p>
                     <p className="text-xs text-blue-600 font-bold mt-0.5">
-                      {(item.price * (item.qty || 1)).toLocaleString('vi-VN')} d
+                      {(item.price * (item.qty || 1)).toLocaleString('vi-VN')} đ
                       {item.qty > 1 && <span className="text-[10px] text-slate-400 font-normal"> (x{item.qty})</span>}
                     </p>
                   </div>
@@ -628,16 +645,16 @@ const StaffPOSPage = () => {
           {/* Checkout Section */}
           <div className="p-5 bg-slate-50 border-t border-slate-200 flex flex-col gap-3">
             <div className="flex justify-between items-end pb-2 border-b border-slate-200">
-              <span className="text-xs uppercase font-bold text-slate-500">TONG THANH TOAN</span>
-              <span className="text-2xl font-black text-blue-600">{subtotal.toLocaleString('vi-VN')} d</span>
+              <span className="text-xs uppercase font-bold text-slate-500">TỔNG THANH TOÁN</span>
+              <span className="text-2xl font-black text-blue-600">{subtotal.toLocaleString('vi-VN')} đ</span>
             </div>
 
             {/* Payment Method Selector */}
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: 'CASH', label: 'Tien Mat', icon: 'payments' },
-                { id: 'CARD', label: 'The POS', icon: 'credit_card' },
-                { id: 'QR', label: 'Quet QR', icon: 'qr_code_2' },
+                { id: 'CASH', label: 'Tiền Mặt', icon: 'payments' },
+                { id: 'CARD', label: 'Thẻ POS', icon: 'credit_card' },
+                { id: 'QR', label: 'Quét QR', icon: 'qr_code_2' },
               ].map((m) => (
                 <button
                   key={m.id}
@@ -658,7 +675,7 @@ const StaffPOSPage = () => {
             {paymentMethod === 'CASH' && (
               <div className="flex flex-col gap-1 mt-1">
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                  <span>Tien khach dua:</span>
+                  <span>Tiền khách đưa:</span>
                   <input
                     type="number"
                     value={cashGiven}
@@ -669,8 +686,8 @@ const StaffPOSPage = () => {
                 </div>
                 {Number(cashGiven) > 0 && (
                   <div className="flex items-center justify-between text-xs font-bold text-emerald-600">
-                    <span>Tien thoi lai:</span>
-                    <span>{changeMoney.toLocaleString('vi-VN')} d</span>
+                    <span>Tiền thối lại:</span>
+                    <span>{changeMoney.toLocaleString('vi-VN')} đ</span>
                   </div>
                 )}
               </div>
@@ -682,7 +699,7 @@ const StaffPOSPage = () => {
               className="w-full py-3 mt-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-sm shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[20px]">print</span>
-              THANH TOAN VA IN VE
+              THANH TOÁN VÀ IN VÉ
             </button>
           </div>
         </div>
@@ -695,26 +712,26 @@ const StaffPOSPage = () => {
           {/* [AI UPDATE - Fix modal bi co hep que tam bang class max-w-[420px]] */}
           <div className="relative bg-white rounded-2xl p-6 w-full max-w-[420px] border border-slate-200 shadow-2xl flex flex-col gap-4 text-slate-900">
             <div className="text-center pb-3 border-b border-dashed border-slate-300">
-              <h3 className="text-lg font-bold text-blue-600 uppercase">Ve Xem Phim CineMax</h3>
-              <p className="text-xs text-slate-500">Ma don: {lastOrder.orderId} | {lastOrder.time}</p>
+              <h3 className="text-lg font-bold text-blue-600 uppercase">Vé Xem Phim CineMax</h3>
+              <p className="text-xs text-slate-500">Mã đơn: {lastOrder.orderId} | {lastOrder.time}</p>
             </div>
 
             <div className="flex flex-col gap-1.5 text-xs">
               <p><span className="text-slate-500">Phim:</span> <strong className="text-slate-900">{lastOrder.showtime?.movie?.title}</strong></p>
-              <p><span className="text-slate-500">Phong:</span> {lastOrder.showtime?.room?.name} ({lastOrder.showtime?.room?.roomType})</p>
-              <p><span className="text-slate-500">Gio chieu:</span> {lastOrder.showtime?.startTime ? new Date(lastOrder.showtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}</p>
+              <p><span className="text-slate-500">Phòng:</span> {lastOrder.showtime?.room?.name} ({getFormatBadge(lastOrder.showtime)})</p>
+              <p><span className="text-slate-500">Giờ chiếu:</span> {lastOrder.showtime?.startTime ? new Date(lastOrder.showtime.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}</p>
               <div className="mt-2 pt-2 border-t border-slate-200">
-                <span className="text-slate-500">Chi tiet:</span>
+                <span className="text-slate-500">Chi tiết:</span>
                 {lastOrder.items.map((i) => (
                   <div key={i.id} className="flex justify-between font-semibold text-xs py-0.5">
                     <span>{i.name}</span>
-                    <span>{(i.price * (i.qty || 1)).toLocaleString('vi-VN')} d</span>
+                    <span>{(i.price * (i.qty || 1)).toLocaleString('vi-VN')} đ</span>
                   </div>
                 ))}
               </div>
               <div className="mt-2 pt-2 border-t border-slate-300 flex justify-between text-sm font-bold text-blue-600">
-                <span>TONG TIEN:</span>
-                <span>{lastOrder.total.toLocaleString('vi-VN')} d</span>
+                <span>TỔNG TIỀN:</span>
+                <span>{lastOrder.total.toLocaleString('vi-VN')} đ</span>
               </div>
             </div>
 
@@ -727,7 +744,7 @@ const StaffPOSPage = () => {
               onClick={() => setPrintTicketModal(false)}
               className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm cursor-pointer"
             >
-              HOAN TAT
+              HOÀN TẤT
             </button>
           </div>
         </div>

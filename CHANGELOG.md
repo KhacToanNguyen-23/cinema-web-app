@@ -2,6 +2,12 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [05-09-2026 17:48] - Fix Loi The Suat Chieu POS Bi Co Chu Va Chuan Hoa Tieng Viet
+### Fixed (Sua loi)
+- `StaffPOSPage.jsx`: Chuyen doi luoi gio chieu sang flex-wrap voi do rong toi thieu min-w-[130px] giup the gio chieu thoang va khong bi chen ep tren moi kich thuoc man hinh; bo sung helper `getFormatBadge` de rut gon dinh dang STANDARD thanh 2D tranh bi cat cut chu (STA); bo sung `whitespace-nowrap` cho gia ve ngan chan rot dong chu so va ky hieu đ.
+### Changed (Thay doi)
+- `StaffPOSPage.jsx`: Chuan hoa toan bo chuoi van ban sang tieng Viet co dau chuan tren he thong ban ve quay POS: Don hang hien tai, Thu ngan, gio hang, thong bao giu ghe, so do ghe (Man chieu, Trong, Ban chon, Dang giu, Da ban), danh muc combo bap nuoc uu dai, cac nut phuong thuc thanh toan (Tien mat, The POS, Quet QR), tien khach dua/thoi lai va modal in ve xem phim. Dong nhat ky hieu tien te thanh đ.
+
 ## [05-09-2026 17:45] - Thiet Ke Lai Giao Dien Ban Ve Quay POS Chuan Cong Nghiep
 ### Changed (Thay doi)
 - `StaffPOSPage.jsx`: Tai cau truc toan bo man hinh chon suat chieu tai quay POS theo mo hinh rap chieu phim cong nghiep (Movie-Centric Box Office Layout). Gom cum thanh cong cu chon nhanh ngay (Hom nay, Ngay mai, cac ngay ke tiep, bo lich Datepicker), o tim kiem phim/phong tuc thi, the thong tin cum rap tu dong dong bo tu API. Gom nhom danh sach suat chieu theo tung phim voi poster thu nho, the tuoi, thoi luong va he thong nut gio chieu cam ung lon (Touch-Friendly Time Pills) hien thi gio bat dau, loai phong/dinh dang (2D/3D/IMAX) va gia ve co ban. Nhan vien quay chi can 1 cham vao gio chieu de mo ngay so do ghe va gio hang.

@@ -39,3 +39,9 @@
 - [x] Refactor `StaffPOSPage.jsx` with date bar, movie-centric horizontal cards and touch time pills <!-- id: 24 -->
 - [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 25 -->
 - [x] Build, verify frontend and push changes to GitHub master <!-- id: 26 -->
+
+# Tasks: Fix Staff POS Time Pills Squishing & Vietnamese Diacritics
+- [x] Fix time pills flex-wrap layout, map roomType STANDARD to 2D, and prevent price text wrap in `StaffPOSPage.jsx` <!-- id: 27 -->
+- [x] Standardize Vietnamese diacritics and đ currency across cart, snacks, and print ticket modal <!-- id: 28 -->
+- [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 29 -->
+- [x] Build, verify frontend and push changes to GitHub master <!-- id: 30 -->
