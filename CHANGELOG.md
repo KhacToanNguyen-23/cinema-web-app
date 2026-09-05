@@ -2,6 +2,10 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [05-09-2026 17:45] - Thiet Ke Lai Giao Dien Ban Ve Quay POS Chuan Cong Nghiep
+### Changed (Thay doi)
+- `StaffPOSPage.jsx`: Tai cau truc toan bo man hinh chon suat chieu tai quay POS theo mo hinh rap chieu phim cong nghiep (Movie-Centric Box Office Layout). Gom cum thanh cong cu chon nhanh ngay (Hom nay, Ngay mai, cac ngay ke tiep, bo lich Datepicker), o tim kiem phim/phong tuc thi, the thong tin cum rap tu dong dong bo tu API. Gom nhom danh sach suat chieu theo tung phim voi poster thu nho, the tuoi, thoi luong va he thong nut gio chieu cam ung lon (Touch-Friendly Time Pills) hien thi gio bat dau, loai phong/dinh dang (2D/3D/IMAX) va gia ve co ban. Nhan vien quay chi can 1 cham vao gio chieu de mo ngay so do ghe va gio hang.
+
 ## [05-09-2026 17:37] - Fix Loi Thoi Gian Ket Thuc Suat Chieu Bat Hop Le Khi Tao Hang Loat
 ### Fixed (Sua loi)
 - `AdminShowtimePage.jsx`: Xay dung ham `formatToLocalISO(date)` dong bo toan bo viec tinh toan ngay gio theo gio dia phuong (Local Time) thay vi pha tron giua UTC date va Local hours trong `handleGeneratePreview`, khac phuc triet de loi cac suat chieu muon vao ban dem ket thuc sau nua dem bi nham thanh ngay hom truoc dan den loi "Thoi gian ket thuc phai sau thoi gian bat dau".

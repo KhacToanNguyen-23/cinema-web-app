@@ -1,10 +1,13 @@
-// [AI UPDATE - Dong bo hoa StaffPOSPage sang Enterprise Light Theme chuan SaaS Office Portal]
+// [AI UPDATE - Chuyen doi StaffPOSPage sang giao dien ban ve rap phim chuan cong nghiep Industrial POS]
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { showtimeApi } from '../../api/showtimeApi';
 import { movieApi } from '../../api/movieApi';
+import { cinemaApi } from '../../api/cinemaApi';
 import { showtimeSeatApi } from '../../api/showtimeSeatApi';
 import { useSeatWebSocket } from '../../hooks/useSeatWebSocket';
+
+const DEFAULT_POSTER = 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80';
 
 const SNACKS = [
   { id: 1, name: 'Bap Rang Bo (Vua)', price: 45000, icon: 'local_dining', desc: 'Bap thom mui bo' },
@@ -26,6 +29,11 @@ const StaffPOSPage = () => {
 
   const [showtimes, setShowtimes] = useState([]);
   const [movies, setMovies] = useState([]);
+  const [cinemas, setCinemas] = useState([]);
+  const [activeCinemaId, setActiveCinemaId] = useState(cinemaId || null);
+  const [posDate, setPosDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [searchTerm, setSearchTerm] = useState('');
+
   const [selectedShowtime, setSelectedShowtime] = useState(null);
   const [seatList, setSeatList] = useState([]);
   const [cartItems, setCartItems] = useState([]);
@@ -42,10 +50,16 @@ const StaffPOSPage = () => {
   const fetchInitialData = async () => {
     try {
       setLoading(true);
-      const [showtimesRes, moviesRes] = await Promise.all([
+      const [showtimesRes, moviesRes, cinemasRes] = await Promise.all([
         showtimeApi.getAllShowtimes(cinemaId),
         movieApi.getAllMovies(),
+        cinemaApi.getAllCinemas().catch(() => ({ data: [] })),
       ]);
+      const fetchedCinemas = (cinemasRes.data || []).filter((c) => c.active || c.isActive);
+      setCinemas(fetchedCinemas);
+      if (!cinemaId && fetchedCinemas.length > 0) {
+        setActiveCinemaId((prev) => prev || fetchedCinemas[0].id);
+      }
       setShowtimes(showtimesRes.data || []);
       setMovies((moviesRes.data || []).filter((m) => m.active || m.isActive));
     } catch (err) {
@@ -54,6 +68,65 @@ const StaffPOSPage = () => {
       setLoading(false);
     }
   };
+
+  // [AI UPDATE - Cac tab chon nhanh ngay chieu chuan man hinh POS]
+  const quickDates = useMemo(() => {
+    const list = [];
+    const today = new Date();
+    for (let i = 0; i < 4; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const dayName = i === 0 ? 'Hôm nay' : i === 1 ? 'Ngày mai' : `Thứ ${d.getDay() === 0 ? 'CN' : d.getDay() + 1}`;
+      const dateText = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+      list.push({ iso, label: `${dayName} (${dateText})` });
+    }
+    return list;
+  }, []);
+
+  const currentCinema = useMemo(() => {
+    return cinemas.find((c) => c.id === activeCinemaId) || (cinemaId ? { id: cinemaId, name: `Cụm rạp #${cinemaId}` } : null);
+  }, [cinemas, activeCinemaId, cinemaId]);
+
+  // [AI UPDATE - Gom nhom suat chieu theo tung bo phim chuan Industrial Box Office POS]
+  const movieShowtimesList = useMemo(() => {
+    const filtered = showtimes.filter((st) => {
+      if (!st.startTime) return false;
+      const stDate = st.startTime.split('T')[0];
+      if (stDate !== posDate) return false;
+      if (activeCinemaId) {
+        const cId = st.room?.cinema?.id || st.room?.cinemaId;
+        if (cId && cId !== activeCinemaId) return false;
+      }
+      return true;
+    });
+
+    const map = new Map();
+    filtered.forEach((st) => {
+      const mId = st.movie?.id;
+      if (!mId) return;
+      if (!map.has(mId)) {
+        const fullMovie = movies.find((m) => m.id === mId) || st.movie;
+        map.set(mId, {
+          movie: fullMovie,
+          showtimes: [],
+        });
+      }
+      map.get(mId).showtimes.push(st);
+    });
+
+    let res = Array.from(map.values()).map((item) => {
+      item.showtimes.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+      return item;
+    });
+
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      res = res.filter((item) => item.movie.title?.toLowerCase().includes(term));
+    }
+
+    return res;
+  }, [showtimes, movies, posDate, activeCinemaId, searchTerm]);
 
   const fetchSeatsForShowtime = async (showtime) => {
     try {
@@ -196,69 +269,192 @@ const StaffPOSPage = () => {
         {/* Left Panel: Showtimes / Seat Map / Snacks */}
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
           {!selectedShowtime ? (
-            <div>
-              <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200">
+            /* [AI UPDATE - Giao dien ban ve quay POS chuan cong nghiep: gom nhom theo phim, chon nhanh ngay, thanh tim kiem va nut gio chieu cam ung] */
+            <div className="space-y-5">
+              {/* Header & Cinema Badge */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
                 <div>
                   <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                     <span className="material-symbols-outlined text-blue-600">point_of_sale</span>
-                    Ban Ve Quay POS
+                    Bán Vé Quầy POS
                   </h1>
-                  <p className="text-slate-500 text-xs mt-0.5">Chon suat chieu de bat dau phuc vu khach hang.</p>
+                  <p className="text-slate-500 text-xs mt-0.5">Chọn suất chiếu theo phim để bắt đầu phục vụ khách hàng.</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-semibold text-xs border border-blue-200">
-                    CUM RAP #{cinemaId || 'N/A'}
-                  </span>
+
+                <div className="flex items-center gap-3">
+                  {/* Cinema Selector if multiple */}
+                  {cinemas.length > 1 && !cinemaId ? (
+                    <select
+                      value={activeCinemaId || ''}
+                      onChange={(e) => setActiveCinemaId(Number(e.target.value))}
+                      className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer shadow-xs"
+                    >
+                      {cinemas.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span className="px-3.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200 flex items-center gap-1.5 shadow-xs">
+                      <span className="material-symbols-outlined text-[16px]">theater_comedy</span>
+                      {currentCinema?.name || (cinemaId ? `Cụm rạp #${cinemaId}` : 'Hệ thống CineMax')}
+                    </span>
+                  )}
                 </div>
               </div>
 
+              {/* Toolbar: Date Selector + Search */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+                {/* Quick Date Pills */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-bold text-slate-500 mr-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[16px]">calendar_today</span>
+                    Ngày:
+                  </span>
+                  {quickDates.map((qd) => (
+                    <button
+                      key={qd.iso}
+                      type="button"
+                      onClick={() => setPosDate(qd.iso)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        posDate === qd.iso
+                          ? 'bg-blue-600 text-white shadow-xs shadow-blue-600/30'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                      }`}
+                    >
+                      {qd.label}
+                    </button>
+                  ))}
+                  <input
+                    type="date"
+                    value={posDate}
+                    onChange={(e) => setPosDate(e.target.value)}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-300 text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-500 cursor-pointer"
+                  />
+                </div>
+
+                {/* Quick Movie Search */}
+                <div className="relative w-full sm:w-64">
+                  <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
+                    search
+                  </span>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Tìm nhanh tên phim..."
+                    className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-slate-50 border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">close</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Movie-Centric Showtimes List */}
               {loading ? (
-                <div className="text-center py-20 text-slate-500 text-xs">Dang tai du lieu suat chieu...</div>
-              ) : showtimes.length === 0 ? (
-                <div className="text-center py-20 text-slate-500 bg-white rounded-xl border border-slate-200 shadow-sm text-xs">
-                  Chua co suat chieu nao hom nay cho cum rap nay.
+                <div className="text-center py-20 text-slate-500 text-xs flex flex-col items-center gap-2">
+                  <div className="w-7 h-7 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Đang tải danh sách suất chiếu...</span>
+                </div>
+              ) : movieShowtimesList.length === 0 ? (
+                <div className="text-center py-16 px-4 bg-white rounded-2xl border border-dashed border-slate-300 shadow-xs flex flex-col items-center">
+                  <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">event_busy</span>
+                  <p className="text-sm font-bold text-slate-700">
+                    Không có suất chiếu nào vào ngày {posDate.split('-').reverse().join('/')}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                    {searchTerm ? 'Không tìm thấy bộ phim phù hợp với từ khóa.' : 'Vui lòng chọn ngày khác trên thanh công cụ hoặc liên hệ Quản lý xếp thêm lịch chiếu.'}
+                  </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {showtimes.map((st) => {
-                    const movie = movies.find((m) => m.id === st.movie?.id);
-                    return (
-                      <div
-                        key={st.id}
-                        onClick={() => fetchSeatsForShowtime(st)}
-                        className="group cursor-pointer bg-white hover:bg-blue-50/30 rounded-xl p-4 border border-slate-200 hover:border-blue-300 transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-start gap-4">
-                            <img
-                              src={movie?.posterUrl || 'https://via.placeholder.com/150'}
-                              alt={movie?.title}
-                              className="w-20 h-28 object-cover rounded-lg shadow-sm shrink-0"
-                            />
-                            <div className="min-w-0">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-600 border border-blue-200">
-                                {st.room?.roomType || '2D'}
-                              </span>
-                              <h3 className="text-sm font-bold text-slate-900 truncate mt-1.5 group-hover:text-blue-600 transition-colors">
-                                {st.movie?.title || 'Phim'}
-                              </h3>
-                              <p className="text-xs text-slate-500 mt-0.5">{st.room?.name}</p>
-                              <p className="text-sm font-bold text-blue-600 mt-2">
-                                {st.price?.toLocaleString('vi-VN')} d
-                              </p>
-                            </div>
+                <div className="space-y-4">
+                  {movieShowtimesList.map(({ movie, showtimes: movieSts }) => (
+                    <div
+                      key={movie.id}
+                      className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-sm transition-all flex flex-col md:flex-row gap-5"
+                    >
+                      {/* Left Column: Movie Info */}
+                      <div className="flex items-start gap-4 md:w-80 shrink-0 md:border-r md:border-slate-100 md:pr-5">
+                        <img
+                          src={movie.posterUrl || DEFAULT_POSTER}
+                          alt={movie.title}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = DEFAULT_POSTER;
+                          }}
+                          className="w-20 h-28 object-cover rounded-xl shadow-xs border border-slate-200 shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+                              {movie.ageLimit || 'P'}
+                            </span>
+                            <span className="text-[11px] font-semibold text-slate-500">
+                              {movie.duration} phút
+                            </span>
+                          </div>
+                          <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">
+                            {movie.title}
+                          </h3>
+                          <p className="text-xs text-slate-500 mt-1 line-clamp-1">
+                            {movie.genre || 'Phim rạp'}
+                          </p>
+                          <div className="mt-2.5 flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            {movieSts.length} suất hôm nay
                           </div>
                         </div>
+                      </div>
 
-                        <div className="mt-3 pt-3 border-t border-slate-200 flex items-center justify-between">
-                          <span className="text-xs font-medium text-slate-500">Gio chieu:</span>
-                          <span className="px-3 py-1 rounded-lg bg-slate-100 text-slate-900 font-bold text-sm border border-slate-200">
-                            {st.startTime ? new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                      {/* Right Column: Time Slots Grid (Touch Friendly Pills) */}
+                      <div className="flex-1 flex flex-col justify-center">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-[16px] text-blue-600">schedule</span>
+                            Khung giờ chiếu
                           </span>
+                          <span className="text-[11px] text-slate-400 italic">Nhấp vào giờ chiếu để chọn ghế</span>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2.5">
+                          {movieSts.map((st) => {
+                            const timeText = st.startTime ? new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
+                            const formatBadge = st.format === 'IMAX_TWO_D' ? 'IMAX' : (st.room?.roomType || '2D');
+                            return (
+                              <button
+                                key={st.id}
+                                type="button"
+                                onClick={() => fetchSeatsForShowtime(st)}
+                                className="group/pill p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-600 hover:border-blue-600 transition-all duration-150 text-left cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between"
+                              >
+                                <div className="flex items-center justify-between w-full mb-1">
+                                  <span className="text-base font-extrabold text-slate-900 group-hover/pill:text-white transition-colors">
+                                    {timeText}
+                                  </span>
+                                  <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white group-hover/pill:bg-blue-500 group-hover/pill:text-white text-slate-600 border border-slate-200 group-hover/pill:border-blue-400">
+                                    {formatBadge}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between w-full text-[11px] text-slate-500 group-hover/pill:text-blue-100">
+                                  <span className="truncate max-w-[70px]">{st.room?.name || 'Phòng 1'}</span>
+                                  <span className="font-bold text-blue-600 group-hover/pill:text-white">
+                                    {st.price?.toLocaleString('vi-VN')} đ
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

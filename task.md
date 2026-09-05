@@ -34,3 +34,8 @@
 - [x] Synchronize start/end date-time formatting to local time in `AdminShowtimePage.jsx` <!-- id: 21 -->
 - [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 22 -->
 - [x] Build, verify frontend and push changes to GitHub master <!-- id: 23 -->
+
+# Tasks: Redesign Staff POS to Industrial Movie-Centric Layout
+- [x] Refactor `StaffPOSPage.jsx` with date bar, movie-centric horizontal cards and touch time pills <!-- id: 24 -->
+- [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 25 -->
+- [x] Build, verify frontend and push changes to GitHub master <!-- id: 26 -->
