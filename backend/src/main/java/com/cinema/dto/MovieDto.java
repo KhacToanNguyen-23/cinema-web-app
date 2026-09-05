@@ -10,6 +10,10 @@ public class MovieDto {
     private String title;
     private String description;
     private int duration; // in minutes
+
+    // [AI UPDATE - Ho tro deserializer linh hoat ca chuoi yyyy-MM-dd va yyyy-MM-ddTHH:mm:ss]
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.cinema.config.FlexibleLocalDateTimeDeserializer.class)
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime releaseDate;
     private String posterUrl;
     private String trailerUrl;

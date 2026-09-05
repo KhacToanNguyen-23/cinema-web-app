@@ -2,6 +2,12 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [05-09-2026 17:25] - Fix Loi Parse LocalDateTime Khi Them Phim Moi
+### Fixed (Sua loi)
+- `AdminMoviePage.jsx`: Chuan hoa truong `releaseDate` sang ISO 8601 LocalDateTime (`YYYY-MM-DDTHH:mm:ss`) truoc khi gui len API de tranh thieu phan thoi gian, dong thoi bo sung o nhap Ngay khoi chieu tren form modal.
+- `MovieDto.java`: Gan `@JsonDeserialize(using = FlexibleLocalDateTimeDeserializer.class)` va `@JsonFormat` de Jackson ho tro giai ma linh hoat ca dinh dang ngay (`yyyy-MM-dd`) lan ngay gio ISO (`yyyy-MM-dd'T'HH:mm:ss`).
+- `FlexibleLocalDateTimeDeserializer.java`: Bo giai ma tuy bien cho Jackson tu dong chuyen doi chuoi ngay thanh `LocalDateTime.atStartOfDay()`.
+
 ## [05-09-2026 17:14] - Fix Loi Modal Admin Co Hep Que Tam va Fallback Poster Phim
 ### Fixed (Sua loi)
 - `index.css`: Bo sung cac utility `@utility max-w-*` voi thuoc tinh `!important` nham ngan chan triet de xung dot giua spacing tokens cua Tailwind CSS v4 va he thong container width, khac phuc loi cac modal bi co hep thanh que doc 16px - 48px tren toan bo he thong.

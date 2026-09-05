@@ -18,3 +18,9 @@
 - [x] Update sample movie poster in `DataInitializer.java` <!-- id: 11 -->
 - [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 12 -->
 - [x] Verify frontend build and push changes to GitHub master <!-- id: 13 -->
+
+# Tasks: Fix Movie Creation LocalDateTime Parse Error
+- [x] Format releaseDate to ISO LocalDateTime in `AdminMoviePage.jsx` and add releaseDate input <!-- id: 14 -->
+- [x] Add flexible @JsonFormat pattern to `MovieDto.java` <!-- id: 15 -->
+- [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 16 -->
+- [x] Build and verify frontend + backend, then push to GitHub master <!-- id: 17 -->
