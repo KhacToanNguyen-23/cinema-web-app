@@ -53,7 +53,8 @@ public class SecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
         // Cấu hình Frontend domain
-        configuration.setAllowedOrigins(java.util.Arrays.asList("http://localhost:5173", "http://localhost:3000"));
+        // [AI UPDATE - Cho phep ca localhost va moi domain Vercel goi API]
+        configuration.setAllowedOriginPatterns(java.util.Arrays.asList("http://localhost:*","https://*.vercel.app"));
         configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
