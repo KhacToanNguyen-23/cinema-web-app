@@ -29,3 +29,8 @@
 - [x] Remove releaseDate input from `AdminMoviePage.jsx` and keep automatic background assignment <!-- id: 18 -->
 - [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 19 -->
 - [x] Build, verify and push changes to GitHub master <!-- id: 20 -->
+
+# Tasks: Fix Batch Showtime EndTime Calculation Bug
+- [x] Synchronize start/end date-time formatting to local time in `AdminShowtimePage.jsx` <!-- id: 21 -->
+- [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 22 -->
+- [x] Build, verify frontend and push changes to GitHub master <!-- id: 23 -->

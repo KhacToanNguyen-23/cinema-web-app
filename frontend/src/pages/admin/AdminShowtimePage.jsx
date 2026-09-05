@@ -180,6 +180,17 @@ const AdminShowtimePage = () => {
     }
   };
 
+  // [AI UPDATE - Chuan hoa dinh dang ISO theo gio dia phuong Local Time tranh lech mui gio UTC qua dem]
+  const formatToLocalISO = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  };
+
   const handleGeneratePreview = () => {
     if (!wizardMovieId) {
       alert('Vui lòng chọn bộ phim!');
@@ -201,8 +212,10 @@ const AdminShowtimePage = () => {
     const selectedMovie = movies.find(m => m.id === Number(wizardMovieId));
     const duration = selectedMovie?.duration || 120;
 
-    const start = new Date(wizardStartDate);
-    const end = new Date(wizardEndDate);
+    const [startYear, startMonth, startDay] = wizardStartDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = wizardEndDate.split('-').map(Number);
+    const start = new Date(startYear, startMonth - 1, startDay, 0, 0, 0);
+    const end = new Date(endYear, endMonth - 1, endDay, 23, 59, 59);
     if (start > end) {
       alert('Ngày bắt đầu không được lớn hơn ngày kết thúc!');
       return;
@@ -217,19 +230,20 @@ const AdminShowtimePage = () => {
       if (wizardDays.includes(currentDayOfWeek)) {
         const isWeekend = currentDayOfWeek === 6 || currentDayOfWeek === 0;
         const currentPrice = isWeekend ? Number(weekendPrice) : Number(weekdayPrice);
-        const dateStr = loopDate.toISOString().split('T')[0];
+        const yearStr = loopDate.getFullYear();
+        const monthStr = String(loopDate.getMonth() + 1).padStart(2, '0');
+        const dayStr = String(loopDate.getDate()).padStart(2, '0');
+        const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
 
         wizardRoomIds.forEach(roomId => {
           const roomObj = rooms.find(r => r.id === roomId);
 
           timeSlots.forEach(timeStr => {
-            const startDateTimeStr = `${dateStr}T${timeStr}:00`;
-            const startDateObj = new Date(startDateTimeStr);
+            const [tHours, tMinutes] = timeStr.split(':').map(Number);
+            const startDateObj = new Date(yearStr, loopDate.getMonth(), loopDate.getDate(), tHours, tMinutes, 0);
+            const startDateTimeStr = formatToLocalISO(startDateObj);
             const endDateObj = new Date(startDateObj.getTime() + (duration + 15) * 60000);
-            
-            const endHours = String(endDateObj.getHours()).padStart(2, '0');
-            const endMinutes = String(endDateObj.getMinutes()).padStart(2, '0');
-            const endDateTimeStr = `${endDateObj.toISOString().split('T')[0]}T${endHours}:${endMinutes}:00`;
+            const endDateTimeStr = formatToLocalISO(endDateObj);
 
             const hasConflict = showtimes.some(existing => {
               if (existing.roomId !== roomId && existing.room?.id !== roomId) return false;

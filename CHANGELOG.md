@@ -2,6 +2,10 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [05-09-2026 17:37] - Fix Loi Thoi Gian Ket Thuc Suat Chieu Bat Hop Le Khi Tao Hang Loat
+### Fixed (Sua loi)
+- `AdminShowtimePage.jsx`: Xay dung ham `formatToLocalISO(date)` dong bo toan bo viec tinh toan ngay gio theo gio dia phuong (Local Time) thay vi pha tron giua UTC date va Local hours trong `handleGeneratePreview`, khac phuc triet de loi cac suat chieu muon vao ban dem ket thuc sau nua dem bi nham thanh ngay hom truoc dan den loi "Thoi gian ket thuc phai sau thoi gian bat dau".
+
 ## [05-09-2026 17:29] - Toi Uu UX Modal Them Phim (Bo Truong Ngay Khoi Chieu)
 ### Changed (Thay doi)
 - `AdminMoviePage.jsx`: Loai bo o nhap `releaseDate` khoi giao dien modal Them/Sua Phim, tra ve bo cuc 2 cot can doi cho Thoi luong va Gioi han do tuoi. He thong tu dong gan moc thoi gian ISO hien tai o backend/logic ngam giup Admin tiet kiem thao tac va de Cinema Manager tu do xep suat chieu tren trang Showtimes.
