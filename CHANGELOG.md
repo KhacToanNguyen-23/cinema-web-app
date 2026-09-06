@@ -2,6 +2,10 @@
 Tất cả các thay đổi nổi bật của dự án này sẽ được ghi lại trong tệp này.
 Dựa trên tiêu chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [06-09-2026 16:55] - Don Dep Script Tam Khoi Phuc Du Lieu Phim
+### Removed (Loai bo)
+- `backend/scripts/seed_movies.cjs`: Xoa bo tep script Node.js tam chay o local de quet anh va nap du lieu phim vao database local, dong thoi loai bo thu muc `backend/scripts/` giup ma nguon du an sach se va dung chuan cau truc.
+
 ## [05-09-2026 17:48] - Fix Loi The Suat Chieu POS Bi Co Chu Va Chuan Hoa Tieng Viet
 ### Fixed (Sua loi)
 - `StaffPOSPage.jsx`: Chuyen doi luoi gio chieu sang flex-wrap voi do rong toi thieu min-w-[130px] giup the gio chieu thoang va khong bi chen ep tren moi kich thuoc man hinh; bo sung helper `getFormatBadge` de rut gon dinh dang STANDARD thanh 2D tranh bi cat cut chu (STA); bo sung `whitespace-nowrap` cho gia ve ngan chan rot dong chu so va ky hieu đ.

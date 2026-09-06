@@ -45,3 +45,8 @@
 - [x] Standardize Vietnamese diacritics and đ currency across cart, snacks, and print ticket modal <!-- id: 28 -->
 - [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 29 -->
 - [x] Build, verify frontend and push changes to GitHub master <!-- id: 30 -->
+
+# Tasks: Clean Up Temporary Seed Movies Script
+- [x] Delete `backend/scripts/seed_movies.cjs` and remove empty `scripts` directory <!-- id: 31 -->
+- [x] Record changes in `CHANGELOG.md` with real-time timestamp <!-- id: 32 -->
+- [x] Commit and push cleanup changes to GitHub master <!-- id: 33 -->
